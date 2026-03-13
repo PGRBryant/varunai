@@ -1,0 +1,43 @@
+:root {
+  /* Colors — identical to Room 404 */
+  --color-void-black: #0A0A0F;
+  --color-purgatory-purple: #1A0A2E;
+  --color-ember-gold: #C8922A;
+  --color-ghost-white: #E8E8F0;
+  --color-warning-red: #FF3B3B;
+  --color-spirit-teal: #00F5C4;
+  --color-bureaucrat-grey: #3A3A4A;
+  --color-glitch-pink: #FF2D78;
+  --color-shadow-blue: #0D1B2A;
+
+  /* Semantic status */
+  --status-healthy: #00F5C4;
+  --status-degraded: #C8922A;
+  --status-error: #FF3B3B;
+  --status-unknown: #3A3A4A;
+
+  /* Typography */
+  --font-body: 'Rajdhani', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-display: 'Cinzel Decorative', serif;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radii */
+  --radius-sharp: 4px;
+  --radius-panel: 8px;
+
+  /* Shadows */
+  --shadow-panel: 0 2px 16px rgba(0, 0, 0, 0.6);
+  --glow-gold: 0 0 12px rgba(200, 146, 42, 0.3);
+  --glow-teal: 0 0 12px rgba(0, 245, 196, 0.2);
+  --glow-red: 0 0 12px rgba(255, 59, 59, 0.3);
+}

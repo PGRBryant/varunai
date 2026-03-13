@@ -1,0 +1,121 @@
+{
+  "id": null,
+  "uid": "varunai-distributed-traces",
+  "title": "Distributed Traces Explorer",
+  "tags": ["varunai", "traces", "observability"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "style": "dark",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Trace Search",
+      "type": "traces",
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "tempo", "uid": "cloud-trace" },
+          "queryType": "search",
+          "serviceName": "varunai-api",
+          "limit": 20
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Demo Flow: Assist Request",
+      "type": "traces",
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 12 },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "tempo", "uid": "cloud-trace" },
+          "queryType": "search",
+          "serviceName": "varunai-api",
+          "spanName": "POST /api/assist",
+          "limit": 10
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Demo Flow: Flag Evaluation",
+      "type": "traces",
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 12 },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "tempo", "uid": "cloud-trace" },
+          "queryType": "search",
+          "serviceName": "mystweaver",
+          "spanName": "flag.evaluate",
+          "limit": 10
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Trace Duration Distribution",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 22 },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byRegexp", "options": ".*varunai-api.*" },
+            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#C8922A" } }]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": ".*mystweaver.*" },
+            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#00F5C4" } }]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": ".*room404.*" },
+            "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "#FF3B3B" } }]
+          }
+        ]
+      },
+      "options": {
+        "tooltip": { "mode": "multi" },
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "p95"] }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum(rate(traces_spanmetrics_latency_bucket[5m])) by (le, service_name))",
+          "legendFormat": "{{service_name}} p95"
+        }
+      ]
+    }
+  ],
+  "templating": { "list": [] },
+  "annotations": { "list": [] }
+}

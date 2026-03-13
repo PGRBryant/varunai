@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import './tokens.css';
+
+body {
+  background-color: var(--color-void-black);
+  color: var(--color-ghost-white);
+  font-family: var(--font-body);
+}
+
+/* All metric values */
+.metric-value {
+  font-family: var(--font-mono);
+  color: var(--color-ember-gold);
+}
+
+.metric-value--teal {
+  color: var(--color-spirit-teal);
+}
+
+/* All labels */
+.label {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: rgba(232, 232, 240, 0.7);
+}
+
+/* All timestamps */
+.timestamp {
+  font-family: var(--font-mono);
+  color: var(--color-bureaucrat-grey);
+}

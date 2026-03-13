@@ -1,0 +1,23 @@
+{
+  "name": "varunai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Observability hub for the internal service ecosystem",
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "clean": "turbo clean"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
