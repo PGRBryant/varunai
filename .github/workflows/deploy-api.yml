@@ -1,9 +1,10 @@
 name: Deploy API
 
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
-    paths: ['apps/varunai-api/**', 'packages/shared/**']
 
 concurrency:
   group: deploy-api
@@ -16,34 +17,56 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check for API changes
+        id: changes
+        run: |
+          CHANGES=$(git diff --name-only ${{ github.event.workflow_run.head_sha }}^..${{ github.event.workflow_run.head_sha }} -- 'apps/varunai-api/' 'packages/shared/' || echo "apps/varunai-api/")
+          if [ -z "$CHANGES" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Skip if no API changes
+        if: steps.changes.outputs.skip == 'true'
+        run: echo "No API or shared changes — skipping deploy"
+
       - id: auth
+        if: steps.changes.outputs.skip != 'true'
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: projects/${{ vars.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider
           service_account: varunai-api@varunai-490119.iam.gserviceaccount.com
 
       - uses: google-github-actions/setup-gcloud@v2
+        if: steps.changes.outputs.skip != 'true'
 
       - name: Build and push Docker image
+        if: steps.changes.outputs.skip != 'true'
         run: |
           gcloud auth configure-docker us-central1-docker.pkg.dev
           docker build \
             -f apps/varunai-api/Dockerfile \
-            -t us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:${{ github.sha }} \
+            -t us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:${{ github.event.workflow_run.head_sha }} \
             -t us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:latest \
             .
           docker push us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api --all-tags
 
       - name: Deploy to Cloud Run
+        if: steps.changes.outputs.skip != 'true'
         run: |
           gcloud run services update varunai-api \
-            --image us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:${{ github.sha }} \
+            --image us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:${{ github.event.workflow_run.head_sha }} \
             --region us-central1
 
       - name: Smoke test
+        if: steps.changes.outputs.skip != 'true'
         run: |
           URL=$(gcloud run services describe varunai-api --region us-central1 --format 'value(status.url)')
           STATUS=$(curl -s -o /dev/null -w '%{http_code}' "$URL/health")

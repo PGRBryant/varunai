@@ -40,7 +40,7 @@ variable "region" {
 
 variable "verika_endpoint" {
   description = "Verika API endpoint URL"
-  default     = "https://verika-api.run.app"
+  default     = "https://verika-api-722466371905.us-east1.run.app"
 }
 
 variable "verika_service_id" {

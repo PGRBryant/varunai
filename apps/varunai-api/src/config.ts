@@ -4,7 +4,7 @@ const envSchema = z.object({
   PORT: z.string().default('8080'),
   GEMINI_API_KEY: z.string().default(''),
   VERIKA_SERVICE_TOKEN: z.string().default(''),
-  VERIKA_ENDPOINT: z.string().default('https://verika-api.run.app'),
+  VERIKA_ENDPOINT: z.string().default('https://verika-api-722466371905.us-east1.run.app'),
   VERIKA_SERVICE_ID: z.string().default('varunai-api'),
   MYSTWEAVER_API_URL: z.string().default('https://mystweaver-api.run.app'),
   ROOM404_API_URL: z.string().default('https://room404-api.run.app'),

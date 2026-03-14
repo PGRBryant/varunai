@@ -1,9 +1,10 @@
 name: Deploy Client
 
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
-    paths: ['apps/client/**', 'packages/shared/**']
 
 concurrency:
   group: deploy-client
@@ -16,31 +17,61 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check for client changes
+        id: changes
+        run: |
+          CHANGES=$(git diff --name-only ${{ github.event.workflow_run.head_sha }}^..${{ github.event.workflow_run.head_sha }} -- 'apps/client/' 'packages/shared/' || echo "apps/client/")
+          if [ -z "$CHANGES" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Skip if no client changes
+        if: steps.changes.outputs.skip == 'true'
+        run: echo "No client or shared changes — skipping deploy"
+
       - uses: pnpm/action-setup@v3
+        if: steps.changes.outputs.skip != 'true'
         with:
           version: 9
 
       - uses: actions/setup-node@v4
+        if: steps.changes.outputs.skip != 'true'
         with:
           node-version: 20
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+        if: steps.changes.outputs.skip != 'true'
 
       - name: Build client (includes shared via turbo)
+        if: steps.changes.outputs.skip != 'true'
         run: pnpm --filter @varunai/client... build
         env:
           VITE_API_URL: https://varunai-api-qk3n3mly6q-uc.a.run.app
           VITE_GRAFANA_URL: https://grafana-qk3n3mly6q-uc.a.run.app
 
       - id: auth
+        if: steps.changes.outputs.skip != 'true'
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: projects/${{ vars.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider
           service_account: varunai-api@varunai-490119.iam.gserviceaccount.com
 
       - name: Deploy to Firebase Hosting
+        if: steps.changes.outputs.skip != 'true'
         run: npx firebase-tools deploy --only hosting --project varunai-490119
+
+      - name: Smoke test
+        if: steps.changes.outputs.skip != 'true'
+        run: |
+          STATUS=$(curl -s -o /dev/null -w '%{http_code}' https://varunai-dashboard.web.app)
+          echo "Dashboard returned HTTP $STATUS"
+          [[ "$STATUS" == "200" ]] || exit 1
