@@ -42,6 +42,11 @@ resource "google_cloud_run_v2_service" "varunai_api" {
         value = "production"
       }
 
+      env {
+        name  = "GRAFANA_URL"
+        value = google_cloud_run_v2_service.grafana.uri
+      }
+
       ports {
         container_port = 8080
       }
@@ -59,8 +64,6 @@ resource "google_cloud_run_v2_service" "otel_collector" {
   name     = "otel-collector"
   location = var.region
 
-  depends_on = [google_secret_manager_secret_version.otel_collector_config]
-
   template {
     scaling {
       min_instance_count = 0
@@ -68,7 +71,7 @@ resource "google_cloud_run_v2_service" "otel_collector" {
     }
 
     containers {
-      image = "gcr.io/cloudrun/hello:latest"
+      image = "${var.region}-docker.pkg.dev/${var.project_id}/varunai-images/otel-collector:latest"
 
       resources {
         limits = {
@@ -77,18 +80,17 @@ resource "google_cloud_run_v2_service" "otel_collector" {
         }
       }
 
-      env {
-        name = "OTEL_CONFIG"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.otel_collector_config.secret_id
-            version = "latest"
-          }
-        }
-      }
-
       ports {
         container_port = 4318
+      }
+
+      startup_probe {
+        tcp_socket {
+          port = 4318
+        }
+        initial_delay_seconds = 5
+        period_seconds        = 3
+        failure_threshold     = 5
       }
     }
 
@@ -114,7 +116,7 @@ resource "google_cloud_run_v2_service" "grafana" {
     }
 
     containers {
-      image = "grafana/grafana-oss:latest"
+      image = "${var.region}-docker.pkg.dev/${var.project_id}/varunai-images/grafana:latest"
 
       resources {
         limits = {
@@ -153,8 +155,27 @@ resource "google_cloud_run_v2_service" "grafana" {
         value = "Viewer"
       }
 
+      env {
+        name  = "GF_SECURITY_ALLOW_EMBEDDING"
+        value = "true"
+      }
+
+      env {
+        name  = "GF_SERVER_SERVE_FROM_SUB_PATH"
+        value = "false"
+      }
+
       ports {
         container_port = 3000
+      }
+
+      startup_probe {
+        http_get {
+          path = "/api/health"
+        }
+        initial_delay_seconds = 10
+        period_seconds        = 5
+        failure_threshold     = 6
       }
     }
 

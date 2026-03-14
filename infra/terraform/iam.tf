@@ -33,6 +33,45 @@ resource "google_cloud_run_v2_service_iam_member" "varunai_api_public" {
   member   = "allUsers"
 }
 
+# Allow unauthenticated access to OTel Collector (services send telemetry)
+resource "google_cloud_run_v2_service_iam_member" "otel_collector_public" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.otel_collector.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
+# Allow unauthenticated access to Grafana (embedded in dashboard)
+resource "google_cloud_run_v2_service_iam_member" "grafana_public" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.grafana.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
+# Cloud Trace write (OTel Collector exports traces)
+resource "google_project_iam_member" "varunai_trace_agent" {
+  project = var.project_id
+  role    = "roles/cloudtrace.agent"
+  member  = "serviceAccount:${google_service_account.varunai_api.email}"
+}
+
+# Monitoring metric writer (OTel Collector exports metrics)
+resource "google_project_iam_member" "varunai_monitoring_writer" {
+  project = var.project_id
+  role    = "roles/monitoring.metricWriter"
+  member  = "serviceAccount:${google_service_account.varunai_api.email}"
+}
+
+# Cloud Logging writer (OTel Collector exports logs)
+resource "google_project_iam_member" "varunai_logging_writer" {
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.varunai_api.email}"
+}
+
 # Cloud Logging
 resource "google_project_iam_member" "varunai_logging_viewer" {
   project = var.project_id

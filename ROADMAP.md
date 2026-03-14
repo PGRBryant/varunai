@@ -70,25 +70,25 @@ Everything is built to make that moment exceptional.
   - Artifact Registry repositories (`artifact_registry.tf`)
   - Workload Identity Federation for GitHub Actions (`workload_identity.tf`)
 
-- [ ] **OTel Collector: Deploy**
+- [x] **OTel Collector: Deploy**
   - `otel-collector/config.yaml` finalized
   - Cloud Run service running (`cloud_run.tf`)
   - Receiving OTLP/HTTP on port 4318
   - Exporting to Cloud Trace, Managed Prometheus, Cloud Logging
   - Health check passing
 
-- [ ] **@internal/telemetry: Publish v0.1.0**
+- [x] **@internal/telemetry: Publish v0.1.0**
   - Package built and published to GitHub Packages
   - Repository dispatch triggers sent to mystweaver, room404, verika repos
   - Integration instructions in each repo's integration doc
 
-- [ ] **Grafana: Deploy**
+- [x] **Grafana: Deploy**
   - Grafana OSS on Cloud Run (single instance, never scale to zero)
   - Data sources provisioned: Managed Prometheus, Cloud Trace, Cloud Logging
   - Custom theme applied matching Varunai design system
   - Dashboard JSON models loaded via provisioning
 
-- [ ] **CI/CD: Pipelines operational**
+- [x] **CI/CD: Pipelines operational**
   - `ci.yml` — lint, typecheck, test on PRs
   - `deploy-api.yml` — build, push, deploy on main
   - `deploy-client.yml` — build, deploy to Firebase on main
