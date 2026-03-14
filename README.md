@@ -201,31 +201,19 @@ The client proxies API requests to the backend automatically.
 
 ### Deploy
 
+Deployments are automated via GitHub Actions on push to `main`:
+
+- **API** — `deploy-api.yml`: Builds Docker image, pushes to Artifact Registry, deploys to Cloud Run (triggers on changes to `apps/varunai-api/` or `packages/shared/`)
+- **Client** — `deploy-client.yml`: Builds React app, deploys to Firebase Hosting via WIF auth (triggers on changes to `apps/client/` or `packages/shared/`)
+- **Telemetry** — `publish-telemetry.yml`: Publishes `@internal/telemetry` to GitHub Packages (triggers on `v*` tags)
+
+For manual infrastructure changes:
+
 ```bash
-# Apply Terraform infrastructure
 cd infra/terraform
 terraform init
 terraform apply
-
-# Build and push the API Docker image
-docker build -t us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:latest \
-  -f apps/varunai-api/Dockerfile .
-docker push us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:latest
-
-# Update Cloud Run to use the new image
-gcloud run services update varunai-api \
-  --image us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:latest \
-  --region us-central1
-
-# Deploy client to Firebase
-pnpm --filter @varunai/client build
-firebase deploy --only hosting
 ```
-
-**Live endpoints:**
-- Dashboard: `https://varunai-dashboard.web.app`
-- API: `https://varunai-api-qk3n3mly6q-uc.a.run.app`
-- Health: `https://varunai-api-qk3n3mly6q-uc.a.run.app/health`
 
 ---
 
@@ -277,15 +265,18 @@ Varunai shares the Room 404 color palette with distinct typography optimized for
 
 ---
 
-## What to Do Next
+## Current Status
 
-See the [Roadmap](ROADMAP.md) for the full phased plan. The immediate next steps:
+**Phase 1 (Core Infrastructure)** and **Phase 2 (The Dashboard)** are complete. All services are deployed and CI/CD is green.
 
-1. **Verify prerequisites** — Is Verika operational? Are MystWeaver and Room 404 deployed?
-2. **Apply Terraform** — Stand up varunai-490119 infrastructure
-3. **Configure Grafana** — Connect data sources after first deploy
-4. **Test the assist loop** — Use mock session data to verify Gemini integration
-5. **Run the full demo flow** — Start Room 404 → open Varunai → let Gemini suggest → confirm → watch the trace propagate
+| Service | URL | Status |
+|---------|-----|--------|
+| Dashboard | [`varunai-dashboard.web.app`](https://varunai-dashboard.web.app) | Deployed |
+| API | [`varunai-api-qk3n3mly6q-uc.a.run.app`](https://varunai-api-qk3n3mly6q-uc.a.run.app/health) | Deployed |
+| Grafana | [`grafana-qk3n3mly6q-uc.a.run.app`](https://grafana-qk3n3mly6q-uc.a.run.app) | Deployed |
+| OTel Collector | [`otel-collector-qk3n3mly6q-uc.a.run.app`](https://otel-collector-qk3n3mly6q-uc.a.run.app) | Deployed |
+
+**Next:** Phase 3 — Gemini Demo Assist. See the [Roadmap](ROADMAP.md) for the full plan.
 
 ---
 
