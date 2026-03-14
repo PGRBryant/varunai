@@ -37,3 +37,18 @@ variable "region" {
   description = "GCP region"
   default     = "us-central1"
 }
+
+variable "verika_api_url" {
+  description = "Verika API base URL"
+  default     = "https://verika-api.run.app"
+}
+
+variable "mystweaver_api_url" {
+  description = "MystWeaver API base URL"
+  default     = "https://mystweaver-api.run.app"
+}
+
+variable "room404_api_url" {
+  description = "Room 404 API base URL"
+  default     = "https://room404-api.run.app"
+}

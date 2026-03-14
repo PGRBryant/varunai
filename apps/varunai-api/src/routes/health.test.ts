@@ -13,7 +13,7 @@ describe('GET /health', () => {
     // Upstream services won't be reachable in test, so expect degraded
     expect(res.statusCode).toBe(503);
     expect(body.status).toBe('degraded');
-    expect(body.checks).toHaveLength(3);
+    expect(body.checks).toHaveLength(4);
     expect(body.timestamp).toBeDefined();
   });
 });

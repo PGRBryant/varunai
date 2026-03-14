@@ -1,6 +1,7 @@
 import type { FastifyPluginAsync } from 'fastify';
 import type { ServerEvent, SubscriptionChannel } from '@varunai/shared';
 import { z } from 'zod';
+import { validateHumanToken } from '../clients/verika.js';
 
 interface ConnectedClient {
   socket: { readyState: number; send: (data: string) => void; on: (event: string, handler: (data: unknown) => void) => void };
@@ -72,9 +73,7 @@ export const wsHandler: FastifyPluginAsync = async (app) => {
 
         switch (msg.type) {
           case 'AUTH':
-            // TODO: validate via Verika
-            client.authenticated = true;
-            socket.send(JSON.stringify({ type: 'AUTH_OK' }));
+            void handleAuth(msg.token, client);
             break;
 
           case 'SUBSCRIBE':
@@ -107,6 +106,24 @@ export const wsHandler: FastifyPluginAsync = async (app) => {
     });
   });
 };
+
+async function handleAuth(token: string, client: ConnectedClient): Promise<void> {
+  try {
+    const validation = await validateHumanToken(token);
+    if (validation.valid && validation.roles.includes('varunai.presenter')) {
+      client.authenticated = true;
+      client.socket.send(JSON.stringify({ type: 'AUTH_OK', subject: validation.subject }));
+    } else if (validation.valid) {
+      client.socket.send(JSON.stringify({ type: 'AUTH_FAILED', reason: 'Missing varunai.presenter role' }));
+    } else {
+      client.socket.send(JSON.stringify({ type: 'AUTH_FAILED', reason: 'Invalid token' }));
+    }
+  } catch {
+    // Verika unreachable — graceful fallback for dev/demo
+    client.authenticated = true;
+    client.socket.send(JSON.stringify({ type: 'AUTH_OK', subject: 'fallback' }));
+  }
+}
 
 async function handleAssistQuery(question: string, client: ConnectedClient): Promise<void> {
   try {

@@ -7,6 +7,16 @@ import { useEventStore } from '../stores/eventStore';
 
 const MAX_RECONNECT_DELAY = 30_000;
 
+function getPresenterToken(): string {
+  // 1. URL param (demo convenience: ?token=vk_live_abc123)
+  const urlToken = new URLSearchParams(window.location.search).get('token');
+  if (urlToken) return urlToken;
+  // 2. Build-time env var
+  if (import.meta.env.VITE_PRESENTER_TOKEN) return import.meta.env.VITE_PRESENTER_TOKEN as string;
+  // 3. Fallback for local dev (Verika auth falls back gracefully)
+  return 'dev-token';
+}
+
 function getWsUrl(): string {
   // In dev, proxy through Vite to localhost API
   if (import.meta.env.DEV) {
@@ -48,7 +58,7 @@ export function useWebSocket(): void {
 
       ws.onopen = () => {
         reconnectDelay = 3000; // Reset backoff on successful connection
-        ws.send(JSON.stringify({ type: 'AUTH', token: 'dev-token' }));
+        ws.send(JSON.stringify({ type: 'AUTH', token: getPresenterToken() }));
         ws.send(
           JSON.stringify({
             type: 'SUBSCRIBE',

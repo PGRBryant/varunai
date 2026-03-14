@@ -2,6 +2,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { fetchFlags, patchFlag } from '../clients/mystweaver.js';
 import { recordFlagChange } from '../assist/context.js';
+import { requireCapability } from '../middleware/verika-auth.js';
 import { broadcast } from './ws.js';
 
 const patchSchema = z.object({
@@ -21,7 +22,7 @@ export const flagRoutes: FastifyPluginAsync = async (app) => {
     }
   });
 
-  app.patch<{ Params: { key: string } }>('/:key', async (request, reply) => {
+  app.patch<{ Params: { key: string } }>('/:key', { preHandler: requireCapability('flag.write') }, async (request, reply) => {
     const { key } = request.params;
     const parsed = patchSchema.safeParse(request.body);
     if (!parsed.success) {

@@ -4,7 +4,10 @@ resource "google_cloud_run_v2_service" "varunai_api" {
   name     = "varunai-api"
   location = var.region
 
-  depends_on = [google_secret_manager_secret_version.gemini_api_key]
+  depends_on = [
+    google_secret_manager_secret_version.gemini_api_key,
+    google_secret_manager_secret_version.verika_service_token,
+  ]
 
   template {
     scaling {
@@ -45,6 +48,31 @@ resource "google_cloud_run_v2_service" "varunai_api" {
       env {
         name  = "GRAFANA_URL"
         value = google_cloud_run_v2_service.grafana.uri
+      }
+
+      env {
+        name = "VERIKA_SERVICE_TOKEN"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.verika_service_token.secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name  = "VERIKA_API_URL"
+        value = var.verika_api_url
+      }
+
+      env {
+        name  = "MYSTWEAVER_API_URL"
+        value = var.mystweaver_api_url
+      }
+
+      env {
+        name  = "ROOM404_API_URL"
+        value = var.room404_api_url
       }
 
       ports {

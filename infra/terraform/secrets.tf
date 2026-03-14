@@ -19,6 +19,13 @@ resource "google_secret_manager_secret" "grafana_secret_key" {
   }
 }
 
+resource "google_secret_manager_secret" "verika_service_token" {
+  secret_id = "verika-service-token"
+  replication {
+    auto {}
+  }
+}
+
 resource "google_secret_manager_secret" "otel_collector_config" {
   secret_id = "otel-collector-config"
   replication {
@@ -41,6 +48,11 @@ resource "google_secret_manager_secret_version" "grafana_admin_password" {
 resource "google_secret_manager_secret_version" "grafana_secret_key" {
   secret      = google_secret_manager_secret.grafana_secret_key.id
   secret_data = "varunai-grafana-secret"
+}
+
+resource "google_secret_manager_secret_version" "verika_service_token" {
+  secret      = google_secret_manager_secret.verika_service_token.id
+  secret_data = "PLACEHOLDER_REPLACE_WITH_VERIKA_TOKEN"
 }
 
 resource "google_secret_manager_secret_version" "otel_collector_config" {
