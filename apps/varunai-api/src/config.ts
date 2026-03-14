@@ -8,7 +8,7 @@ const envSchema = z.object({
   ROOM404_API_URL: z.string().default('https://room404-api.run.app'),
   VERIKA_API_URL: z.string().default('https://verika-api.run.app'),
   GRAFANA_URL: z.string().default('http://localhost:3000'),
-  GCP_PROJECT_ID: z.string().default('varunai-prod'),
+  GCP_PROJECT_ID: z.string().default('varunai-490119'),
   NODE_ENV: z.string().default('development'),
 });
 

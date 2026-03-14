@@ -42,7 +42,7 @@ Everything is built to make that moment exceptional.
   - `traceContext` field added to WebSocket JOIN message
   - See [docs/room404-integration.md](docs/room404-integration.md)
 
-- [ ] **GCP Project: varunai-prod created**
+- [ ] **GCP Project: varunai-490119 created**
   - APIs enabled: Cloud Run, Secret Manager, Artifact Registry, Managed Prometheus, Cloud Trace, Cloud Logging, Firebase Hosting
   - Billing account linked
 

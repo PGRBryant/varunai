@@ -4,7 +4,7 @@ datasources:
   - name: Managed Prometheus
     type: prometheus
     access: proxy
-    url: https://monitoring.googleapis.com/v1/projects/varunai-prod/location/global/prometheus
+    url: https://monitoring.googleapis.com/v1/projects/varunai-490119/location/global/prometheus
     isDefault: true
     jsonData:
       authenticationType: gce
@@ -24,4 +24,4 @@ datasources:
     access: proxy
     jsonData:
       authenticationType: gce
-      defaultProject: varunai-prod
+      defaultProject: varunai-490119

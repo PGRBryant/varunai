@@ -31,7 +31,7 @@ The API validates its environment with Zod on startup (`apps/varunai-api/src/con
 | `ROOM404_API_URL` | `https://room404-api.run.app` | Override for local dev |
 | `VERIKA_API_URL` | `https://verika-api.run.app` | Override for local dev |
 | `GRAFANA_URL` | `http://localhost:3000` | Grafana base URL |
-| `GCP_PROJECT_ID` | `varunai-prod` | GCP project for Pub/Sub, secrets, etc. |
+| `GCP_PROJECT_ID` | `varunai-490119` | GCP project for Pub/Sub, secrets, etc. |
 
 The client reads `VITE_GRAFANA_URL` (defaults to `http://localhost:3000`).
 

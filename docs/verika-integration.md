@@ -26,7 +26,7 @@ Add `varunai` to Verika's service registry (typically a configuration file, data
   "serviceId": "varunai",
   "displayName": "Varunai Dashboard",
   "description": "Live demo operations dashboard with AI-powered assist",
-  "serviceAccountEmail": "varunai-api@varunai-prod.iam.gserviceaccount.com",
+  "serviceAccountEmail": "varunai-api@varunai-490119.iam.gserviceaccount.com",
   "environment": "production",
   "capabilities": [
     "flag.write",
@@ -48,7 +48,7 @@ curl -X POST https://verika-api.run.app/api/admin/services \
   -d '{
     "serviceId": "varunai",
     "displayName": "Varunai Dashboard",
-    "serviceAccountEmail": "varunai-api@varunai-prod.iam.gserviceaccount.com",
+    "serviceAccountEmail": "varunai-api@varunai-490119.iam.gserviceaccount.com",
     "capabilities": ["flag.write", "session.read", "audit.read", "metrics.read", "stream.subscribe"]
   }'
 ```
@@ -109,16 +109,16 @@ const VARUNAI_CAPABILITIES = [
 
 The Varunai service account must have cross-project IAM bindings so it can authenticate to services running in other GCP projects.
 
-### `varunai-prod` Terraform Configuration
+### `varunai-490119` Terraform Configuration
 
 ```hcl
-# terraform/varunai-prod/iam.tf
+# terraform/varunai-490119/iam.tf
 
 # Service account for varunai-api Cloud Run service
 resource "google_service_account" "varunai_api" {
   account_id   = "varunai-api"
   display_name = "Varunai API Service Account"
-  project      = "varunai-prod"
+  project      = "varunai-490119"
 }
 
 # Grant the SA permission to invoke Cloud Run services in other projects
@@ -171,10 +171,10 @@ If services are in separate GCP projects, the Varunai SA needs `roles/iam.servic
 
 | Source SA | Target | Role | Purpose |
 |---|---|---|---|
-| `varunai-api@varunai-prod` | `mystweaver-api` Cloud Run (mystweaver-prod) | `roles/run.invoker` | Call MystWeaver endpoints |
-| `varunai-api@varunai-prod` | `room404-api` Cloud Run (room404-prod) | `roles/run.invoker` | Call Room 404 endpoints |
-| `varunai-api@varunai-prod` | `verika-api` Cloud Run (verika-prod) | `roles/run.invoker` | Validate tokens |
-| `varunai-api@varunai-prod` | `flag-updates` Pub/Sub subscription (mystweaver-prod) | `roles/pubsub.subscriber` | Receive flag change events |
+| `varunai-api@varunai-490119` | `mystweaver-api` Cloud Run (mystweaver-prod) | `roles/run.invoker` | Call MystWeaver endpoints |
+| `varunai-api@varunai-490119` | `room404-api` Cloud Run (room404-prod) | `roles/run.invoker` | Call Room 404 endpoints |
+| `varunai-api@varunai-490119` | `verika-api` Cloud Run (verika-prod) | `roles/run.invoker` | Validate tokens |
+| `varunai-api@varunai-490119` | `flag-updates` Pub/Sub subscription (mystweaver-prod) | `roles/pubsub.subscriber` | Receive flag change events |
 
 ## Prerequisite 4: Human Token with `varunai.presenter` Role
 
@@ -313,7 +313,7 @@ case 'AUTH': {
 
 ## Prerequisite 6: Cross-Project Service Account Bindings (Detail)
 
-In a multi-project GCP setup, Varunai's service account lives in `varunai-prod` but needs to call services in `mystweaver-prod`, `room404-prod`, and `verika-prod`. This requires:
+In a multi-project GCP setup, Varunai's service account lives in `varunai-490119` but needs to call services in `mystweaver-prod`, `room404-prod`, and `verika-prod`. This requires:
 
 ### 1. Cloud Run Invoker Bindings
 

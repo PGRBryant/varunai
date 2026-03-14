@@ -112,7 +112,7 @@ MystWeaver publishes flag change events to a Google Cloud Pub/Sub topic (likely 
 **What needs to happen:**
 
 1. The `flag-updates` topic must exist in the MystWeaver GCP project.
-2. The Varunai service account (`varunai-api@varunai-prod.iam.gserviceaccount.com`) must have `roles/pubsub.subscriber` on a subscription to that topic.
+2. The Varunai service account (`varunai-api@varunai-490119.iam.gserviceaccount.com`) must have `roles/pubsub.subscriber` on a subscription to that topic.
 3. A push subscription must be configured pointing to `https://varunai-api.run.app/api/pubsub/flag-updates`.
 
 **Terraform snippet** (in the MystWeaver or shared infrastructure repo):
@@ -132,7 +132,7 @@ resource "google_pubsub_subscription" "varunai_flag_updates" {
     push_endpoint = "https://varunai-api.run.app/api/pubsub/flag-updates"
 
     oidc_token {
-      service_account_email = "varunai-api@varunai-prod.iam.gserviceaccount.com"
+      service_account_email = "varunai-api@varunai-490119.iam.gserviceaccount.com"
     }
   }
 
@@ -144,7 +144,7 @@ resource "google_pubsub_subscription" "varunai_flag_updates" {
 resource "google_pubsub_subscription_iam_member" "varunai_subscriber" {
   subscription = google_pubsub_subscription.varunai_flag_updates.id
   role         = "roles/pubsub.subscriber"
-  member       = "serviceAccount:varunai-api@varunai-prod.iam.gserviceaccount.com"
+  member       = "serviceAccount:varunai-api@varunai-490119.iam.gserviceaccount.com"
 }
 ```
 

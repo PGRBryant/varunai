@@ -20,13 +20,13 @@ processors:
 
 exporters:
   googlecloud:
-    project: varunai-prod
+    project: varunai-490119
 
   googlemanagedprometheus:
-    project: varunai-prod
+    project: varunai-490119
 
   googlecloud/logging:
-    project: varunai-prod
+    project: varunai-490119
     log:
       default_log_name: varunai-otel
 

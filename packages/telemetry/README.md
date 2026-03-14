@@ -12,7 +12,7 @@ initTelemetry({
   serviceName: 'mystweaver-api',
   serviceVersion: '1.4.2',
   environment: 'production',
-  collectorEndpoint: 'https://otel-collector.varunai-prod.run.app',
+  collectorEndpoint: 'https://otel-collector.varunai-490119.run.app',
 });
 
 // Logger with automatic trace correlation

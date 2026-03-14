@@ -30,7 +30,7 @@ provider "google-beta" {
 
 variable "project_id" {
   description = "GCP project ID"
-  default     = "varunai-prod"
+  default     = "varunai-490119"
 }
 
 variable "region" {

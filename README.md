@@ -270,7 +270,7 @@ Varunai shares the Room 404 color palette with distinct typography optimized for
 See the [Roadmap](ROADMAP.md) for the full phased plan. The immediate next steps:
 
 1. **Verify prerequisites** — Is Verika operational? Are MystWeaver and Room 404 deployed?
-2. **Apply Terraform** — Stand up varunai-prod infrastructure
+2. **Apply Terraform** — Stand up varunai-490119 infrastructure
 3. **Configure Grafana** — Connect data sources after first deploy
 4. **Test the assist loop** — Use mock session data to verify Gemini integration
 5. **Run the full demo flow** — Start Room 404 → open Varunai → let Gemini suggest → confirm → watch the trace propagate
