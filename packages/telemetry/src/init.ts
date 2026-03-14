@@ -38,13 +38,16 @@ export function initTelemetry(config: TelemetryConfig): void {
     url: `${config.collectorEndpoint}/v1/metrics`,
   });
 
+  const metricReader = new PeriodicExportingMetricReader({
+    exporter: metricExporter,
+    exportIntervalMillis: 15_000,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- OTel version mismatch between sdk-node and sdk-metrics
   sdk = new NodeSDK({
     resource,
     traceExporter,
-    metricReader: new PeriodicExportingMetricReader({
-      exporter: metricExporter,
-      exportIntervalMillis: 15_000,
-    }),
+    metricReader: metricReader as any,
     instrumentations: [
       getNodeAutoInstrumentations({
         '@opentelemetry/instrumentation-fs': { enabled: false },

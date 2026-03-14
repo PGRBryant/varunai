@@ -1,7 +1,7 @@
+@import './tokens.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import './tokens.css';
 
 body {
   background-color: var(--color-void-black);

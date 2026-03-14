@@ -1,9 +1,8 @@
 import type { FastifyPluginAsync } from 'fastify';
-import type { WebSocket } from 'ws';
 import type { ServerEvent, ClientMessage, SubscriptionChannel } from '@varunai/shared';
 
 interface ConnectedClient {
-  socket: WebSocket;
+  socket: { readyState: number; send: (data: string) => void; on: (event: string, handler: (data: unknown) => void) => void };
   channels: Set<SubscriptionChannel>;
   authenticated: boolean;
 }
@@ -39,7 +38,7 @@ export const wsHandler: FastifyPluginAsync = async (app) => {
     };
     clients.add(client);
 
-    socket.on('message', (raw) => {
+    socket.on('message', (raw: unknown) => {
       try {
         const msg = JSON.parse(String(raw)) as ClientMessage;
 

@@ -15,7 +15,7 @@ export function recordFlagChange(change: (typeof recentChanges)[number]): void {
   recentChanges.push(change);
   // Keep only last 90 seconds of changes
   const cutoff = Date.now() - 90_000;
-  while (recentChanges.length > 0 && recentChanges[0].timestamp < cutoff) {
+  while (recentChanges.length > 0 && recentChanges[0]!.timestamp < cutoff) {
     recentChanges.shift();
   }
 }

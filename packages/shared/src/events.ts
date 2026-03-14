@@ -1,4 +1,4 @@
-import type { SessionState, Standing } from './session.js';
+import type { Standing } from './session.js';
 import type { AssistSuggestion, FlagValue } from './assist.js';
 
 // ── Server → Client messages ──────────────────────────────────────
