@@ -42,12 +42,12 @@ Everything is built to make that moment exceptional.
   - `traceContext` field added to WebSocket JOIN message
   - See [docs/room404-integration.md](docs/room404-integration.md)
 
-- [ ] **GCP Project: varunai-490119 created**
+- [x] **GCP Project: varunai-490119 created**
   - APIs enabled: Cloud Run, Secret Manager, Artifact Registry, Managed Prometheus, Cloud Trace, Cloud Logging, Firebase Hosting
   - Billing account linked
 
-- [ ] **Secrets provisioned**
-  - `gemini-api-key` in Secret Manager
+- [x] **Secrets provisioned**
+  - `gemini-api-key` in Secret Manager (placeholder — replace with real key)
   - `grafana-admin-password` in Secret Manager
   - `grafana-secret-key` in Secret Manager
 
@@ -64,7 +64,7 @@ Everything is built to make that moment exceptional.
 
 ### Tasks
 
-- [ ] **Terraform: Apply base infrastructure**
+- [x] **Terraform: Apply base infrastructure**
   - Service accounts and IAM bindings (`iam.tf`)
   - Secret Manager secrets (`secrets.tf`)
   - Artifact Registry repositories (`artifact_registry.tf`)
@@ -94,7 +94,7 @@ Everything is built to make that moment exceptional.
   - `deploy-client.yml` — build, deploy to Firebase on main
   - `publish-telemetry.yml` — publish on tags
 
-- [ ] **Varunai API: Base deployment**
+- [x] **Varunai API: Base deployment**
   - Fastify server running on Cloud Run
   - `/health` endpoint returning status
   - CORS and WebSocket configured

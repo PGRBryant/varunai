@@ -223,6 +223,7 @@ firebase deploy --only hosting
 ```
 
 **Live endpoints:**
+- Dashboard: `https://varunai-dashboard.web.app`
 - API: `https://varunai-api-qk3n3mly6q-uc.a.run.app`
 - Health: `https://varunai-api-qk3n3mly6q-uc.a.run.app/health`
 
