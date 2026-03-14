@@ -27,9 +27,10 @@ The API validates its environment with Zod on startup (`apps/varunai-api/src/con
 | `PORT` | `8080` | API listen port |
 | `GEMINI_API_KEY` | (empty) | Required for the assist loop to generate suggestions |
 | `VERIKA_SERVICE_TOKEN` | (empty) | Service-to-service auth with Verika |
+| `VERIKA_ENDPOINT` | `https://verika-api.run.app` | Verika API endpoint URL |
+| `VERIKA_SERVICE_ID` | `varunai-api` | Service ID in Verika's registry |
 | `MYSTWEAVER_API_URL` | `https://mystweaver-api.run.app` | Override for local dev |
 | `ROOM404_API_URL` | `https://room404-api.run.app` | Override for local dev |
-| `VERIKA_API_URL` | `https://verika-api.run.app` | Override for local dev |
 | `GRAFANA_URL` | `http://localhost:3000` | Grafana base URL |
 | `GCP_PROJECT_ID` | `varunai-490119` | GCP project for Pub/Sub, secrets, etc. |
 

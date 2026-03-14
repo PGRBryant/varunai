@@ -194,9 +194,10 @@ The client proxies API requests to the backend automatically.
 |----------|-------------|
 | `GEMINI_API_KEY` | Google AI Studio API key |
 | `VERIKA_SERVICE_TOKEN` | Varunai's Verika service identity token |
+| `VERIKA_ENDPOINT` | Verika API endpoint URL |
+| `VERIKA_SERVICE_ID` | Service ID registered in Verika's service registry |
 | `MYSTWEAVER_API_URL` | MystWeaver API base URL |
 | `ROOM404_API_URL` | Room 404 game server base URL |
-| `VERIKA_API_URL` | Verika API base URL |
 | `GRAFANA_URL` | Grafana instance URL |
 
 ### Deploy
@@ -267,7 +268,7 @@ Varunai shares the Room 404 color palette with distinct typography optimized for
 
 ## Current Status
 
-**Phase 1 (Core Infrastructure)** and **Phase 2 (The Dashboard)** are complete. All services are deployed and CI/CD is green.
+**Phase 1 (Core Infrastructure)**, **Phase 2 (The Dashboard)**, and **Phase 3 (Gemini Demo Assist)** are complete. Verika Phase 0 integration is in place. All services are deployed and CI/CD is green.
 
 | Service | URL | Status |
 |---------|-----|--------|
@@ -276,7 +277,7 @@ Varunai shares the Room 404 color palette with distinct typography optimized for
 | Grafana | [`grafana-qk3n3mly6q-uc.a.run.app`](https://grafana-qk3n3mly6q-uc.a.run.app) | Deployed |
 | OTel Collector | [`otel-collector-qk3n3mly6q-uc.a.run.app`](https://otel-collector-qk3n3mly6q-uc.a.run.app) | Deployed |
 
-**Next:** Phase 3 — Gemini Demo Assist. See the [Roadmap](ROADMAP.md) for the full plan.
+See the [Roadmap](ROADMAP.md) for the full plan.
 
 ---
 
