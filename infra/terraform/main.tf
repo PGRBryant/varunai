@@ -50,10 +50,10 @@ variable "verika_service_id" {
 
 variable "mystweaver_api_url" {
   description = "MystWeaver API base URL"
-  default     = "https://mystweaver-api.run.app"
+  default     = "https://mystweaver-api-afhjeehpqa-uc.a.run.app"
 }
 
 variable "room404_api_url" {
   description = "Room 404 API base URL"
-  default     = "https://room404-api.run.app"
+  default     = "https://room404-game-server-dev-aed45jff7q-uc.a.run.app"
 }
