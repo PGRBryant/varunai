@@ -26,7 +26,7 @@ export const healthRoutes: FastifyPluginAsync = async (app) => {
     const checks = await Promise.all([
       checkService('mystweaver', `${config.MYSTWEAVER_API_URL}/health`),
       checkService('room404', `${config.ROOM404_API_URL}/health`),
-      checkService('verika', `${config.VERIKA_API_URL}/health`),
+      checkService('verika', `${config.VERIKA_ENDPOINT}/health`),
       checkService('grafana', `${config.GRAFANA_URL}/api/health`),
     ]);
 

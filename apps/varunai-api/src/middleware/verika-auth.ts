@@ -33,7 +33,7 @@ export function requireCapability(capability: string) {
         });
       }
     } catch {
-      // Verika unreachable — graceful fallback for dev/demo
+      // TODO(verika): Remove fallback once Verika is live — reject on unreachable
     }
   };
 }

@@ -12,6 +12,7 @@ const patchSchema = z.object({
 });
 
 export const flagRoutes: FastifyPluginAsync = async (app) => {
+  // TODO(verika): Add requireCapability('flag.read') once Verika is live
   app.get('/current', async (_request, reply) => {
     try {
       const flags = await fetchFlags();

@@ -21,6 +21,7 @@ const flagChangePayloadSchema = z.object({
 });
 
 export const pubsubRoutes: FastifyPluginAsync = async (app) => {
+  // TODO(verika): Verify Pub/Sub push token via OIDC audience check
   app.post('/flag-updates', async (request, reply) => {
     try {
       const bodyResult = pubsubBodySchema.safeParse(request.body);

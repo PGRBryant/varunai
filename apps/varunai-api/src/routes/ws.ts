@@ -107,6 +107,7 @@ export const wsHandler: FastifyPluginAsync = async (app) => {
   });
 };
 
+// TODO(verika): Remove fallback once Verika is live — reject unauthenticated connections
 async function handleAuth(token: string, client: ConnectedClient): Promise<void> {
   try {
     const validation = await validateHumanToken(token);

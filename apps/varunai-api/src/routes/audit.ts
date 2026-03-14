@@ -2,6 +2,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import { fetchAuditLog } from '../clients/mystweaver.js';
 
 export const auditRoutes: FastifyPluginAsync = async (app) => {
+  // TODO(verika): Add requireCapability('audit.read') once Verika is live
   app.get('/stream', async (request, reply) => {
     reply.raw.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -28,6 +29,7 @@ export const auditRoutes: FastifyPluginAsync = async (app) => {
     });
   });
 
+  // TODO(verika): Add requireCapability('experiment.read') once Verika is live
   app.get('/experiments/active', async (_request, reply) => {
     try {
       const { fetchExperiments } = await import('../clients/mystweaver.js');

@@ -61,8 +61,13 @@ resource "google_cloud_run_v2_service" "varunai_api" {
       }
 
       env {
-        name  = "VERIKA_API_URL"
-        value = var.verika_api_url
+        name  = "VERIKA_ENDPOINT"
+        value = var.verika_endpoint
+      }
+
+      env {
+        name  = "VERIKA_SERVICE_ID"
+        value = var.verika_service_id
       }
 
       env {

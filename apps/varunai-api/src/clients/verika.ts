@@ -8,13 +8,13 @@ interface TokenValidation {
 }
 
 export async function validateHumanToken(token: string): Promise<TokenValidation> {
-  const res = await fetch(`${config.VERIKA_API_URL}/api/tokens/validate`, {
+  const res = await fetch(`${config.VERIKA_ENDPOINT}/api/tokens/validate`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${config.VERIKA_SERVICE_TOKEN}`,
     },
-    body: JSON.stringify({ token }),
+    body: JSON.stringify({ token, serviceId: config.VERIKA_SERVICE_ID }),
   });
   if (!res.ok) {
     return { valid: false, subject: '', roles: [], capabilities: [] };
