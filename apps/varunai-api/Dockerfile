@@ -24,4 +24,5 @@ COPY --from=build /app/apps/varunai-api/node_modules ./apps/varunai-api/node_mod
 COPY --from=build /app/apps/varunai-api/dist ./apps/varunai-api/dist
 COPY --from=build /app/apps/varunai-api/package.json ./apps/varunai-api/
 EXPOSE 8080
+USER node
 CMD ["node", "apps/varunai-api/dist/index.js"]

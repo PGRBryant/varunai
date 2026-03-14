@@ -16,11 +16,10 @@ export async function generateSuggestion(
     ? `${question}\n\nCurrent session context:\n${buildUserPrompt(context)}`
     : buildUserPrompt(context);
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 3000);
+  const timeoutMs = 3000;
 
   try {
-    const result = await model.generateContent({
+    const geminiPromise = model.generateContent({
       contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
       systemInstruction: { role: 'model', parts: [{ text: systemPrompt }] },
       generationConfig: {
@@ -29,7 +28,11 @@ export async function generateSuggestion(
       },
     });
 
-    clearTimeout(timeout);
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Gemini call timed out')), timeoutMs)
+    );
+
+    const result = await Promise.race([geminiPromise, timeoutPromise]);
 
     const text = result.response.text();
     if (!text || text.trim() === 'null') return null;
@@ -39,8 +42,7 @@ export async function generateSuggestion(
 
     return parsed;
   } catch (err) {
-    clearTimeout(timeout);
-    if (err instanceof Error && err.name !== 'AbortError') {
+    if (err instanceof Error) {
       console.error('[assist] Gemini call failed:', err.message);
     }
     return null;

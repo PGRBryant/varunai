@@ -9,3 +9,7 @@ otel-collector
 infra
 docs
 .turbo
+.env
+.env.*
+.env.local
+*.env

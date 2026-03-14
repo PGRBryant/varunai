@@ -20,7 +20,7 @@ export const assistRoutes: FastifyPluginAsync = async (app) => {
       return reply.send(suggestion);
     } catch (err) {
       app.log.error(err, 'Assist suggest failed');
-      return reply.send(null);
+      return reply.status(204).send();
     }
   });
 };

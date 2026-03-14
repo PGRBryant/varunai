@@ -33,7 +33,7 @@ export function SessionPanel() {
                 <div className="flex-1 bg-bureaucrat-grey/30 rounded-sm h-3 overflow-hidden">
                   <div
                     className="h-full bg-spirit-teal/70 rounded-sm"
-                    style={{ width: `${(count / session.playerCount) * 100}%` }}
+                    style={{ width: `${session.playerCount > 0 ? (count / session.playerCount) * 100 : 0}%` }}
                   />
                 </div>
                 <span className="font-mono text-xs text-ghost-white/60 w-6">{count}</span>

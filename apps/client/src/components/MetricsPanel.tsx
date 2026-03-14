@@ -25,6 +25,7 @@ export function MetricsPanel() {
           src={`${grafanaUrl}/d/${dashboardUid}?${params.toString()}`}
           className="w-full h-full border-0"
           title="Grafana Metrics"
+          sandbox="allow-scripts allow-same-origin"
         />
       </div>
     </div>

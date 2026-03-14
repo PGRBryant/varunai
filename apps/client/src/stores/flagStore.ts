@@ -14,15 +14,16 @@ export const useFlagStore = create<FlagStore>((set) => ({
   setFlag: (key, value) =>
     set((state) => ({ flags: { ...state.flags, [key]: value } })),
   updateFlag: (key, value) => {
-    // Optimistic update
+    const previousValue = useFlagStore.getState().flags[key];
     set((state) => ({ flags: { ...state.flags, [key]: value } }));
-    // Fire to API
     fetch(`/api/flags/${encodeURIComponent(key)}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ value }),
     }).catch(() => {
-      // Silent failure — flag state will reconcile on next poll
+      if (previousValue !== undefined) {
+        set((state) => ({ flags: { ...state.flags, [key]: previousValue } }));
+      }
     });
   },
 }));

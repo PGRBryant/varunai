@@ -1,11 +1,33 @@
 import type { FastifyPluginAsync } from 'fastify';
-import type { ServerEvent, ClientMessage, SubscriptionChannel } from '@varunai/shared';
+import type { ServerEvent, SubscriptionChannel } from '@varunai/shared';
+import { z } from 'zod';
 
 interface ConnectedClient {
   socket: { readyState: number; send: (data: string) => void; on: (event: string, handler: (data: unknown) => void) => void };
   channels: Set<SubscriptionChannel>;
   authenticated: boolean;
 }
+
+const authSchema = z.object({ type: z.literal('AUTH'), token: z.string() });
+const subscribeSchema = z.object({
+  type: z.literal('SUBSCRIBE'),
+  channels: z.array(z.enum(['session', 'flags', 'assist', 'audit'])),
+});
+const pingSchema = z.object({ type: z.literal('PING') });
+const assistQuerySchema = z.object({ type: z.literal('ASSIST_QUERY'), question: z.string() });
+const flagChangeSchema = z.object({
+  type: z.literal('FLAG_CHANGE'),
+  key: z.string(),
+  value: z.union([z.string(), z.number(), z.boolean()]),
+});
+
+const clientMessageSchema = z.discriminatedUnion('type', [
+  authSchema,
+  subscribeSchema,
+  pingSchema,
+  assistQuerySchema,
+  flagChangeSchema,
+]);
 
 const clients = new Set<ConnectedClient>();
 
@@ -40,7 +62,13 @@ export const wsHandler: FastifyPluginAsync = async (app) => {
 
     socket.on('message', (raw: unknown) => {
       try {
-        const msg = JSON.parse(String(raw)) as ClientMessage;
+        const json: unknown = JSON.parse(String(raw));
+        const result = clientMessageSchema.safeParse(json);
+        if (!result.success) {
+          console.warn('[ws] Invalid message:', result.error.format());
+          return;
+        }
+        const msg = result.data;
 
         switch (msg.type) {
           case 'AUTH':
@@ -94,10 +122,19 @@ async function handleAssistQuery(question: string, client: ConnectedClient): Pro
   }
 }
 
-async function handleFlagChange(key: string, value: unknown): Promise<void> {
+async function handleFlagChange(key: string, value: string | number | boolean): Promise<void> {
   try {
     const { patchFlag } = await import('../clients/mystweaver.js');
-    await patchFlag(key, value as string, 'Manual change from dashboard');
+    const { recordFlagChange } = await import('../assist/context.js');
+    await patchFlag(key, String(value), 'Manual change from dashboard');
+    recordFlagChange({
+      flagKey: key,
+      previousValue: undefined,
+      newValue: value,
+      changedBy: 'dashboard',
+      timestamp: Date.now(),
+      traceId: crypto.randomUUID(),
+    });
   } catch {
     // Silent failure
   }
