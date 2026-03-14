@@ -5,9 +5,11 @@ import { FlagsPanel } from './FlagsPanel';
 import { MetricsPanel } from './MetricsPanel';
 import { AssistBar } from './AssistBar';
 import { useWebSocket } from '../hooks/useWebSocket';
+import { useInitialData } from '../hooks/useInitialData';
 
 export function DashboardLayout() {
   useWebSocket();
+  useInitialData();
 
   return (
     <div className="h-screen w-screen flex flex-col bg-void-black overflow-hidden">

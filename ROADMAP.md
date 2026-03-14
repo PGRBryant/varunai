@@ -114,56 +114,57 @@ Everything is built to make that moment exceptional.
 
 ### Tasks
 
-- [ ] **Design system: tokens.css + Tailwind config**
+- [x] **Design system: tokens.css + Tailwind config**
   - All CSS custom properties defined
   - Tailwind theme extended with Varunai palette
   - Google Fonts loaded (Cinzel Decorative, Rajdhani, Share Tech Mono)
   - Design rules enforced (metric values in Share Tech Mono, etc.)
 
-- [ ] **StatusBar component**
+- [x] **StatusBar component**
   - VARUNAI wordmark (Cinzel Decorative, ember-gold, appears once)
   - Service health dots (spirit-teal/ember-gold/warning-red)
   - Pulsing animation on health check
   - Live clock (Share Tech Mono)
 
-- [ ] **SessionPanel component**
+- [x] **SessionPanel component**
   - Room 404 live session state
   - Player count, floor distribution bars, completion rate, avg score
   - Leaderboard top 5
-  - Polling Room 404 via `/api/session/current` every 2 seconds
+  - Initial fetch via `/api/session/current` + WebSocket updates
 
-- [ ] **TraceFeedPanel component**
+- [x] **TraceFeedPanel component**
   - Real-time audit event feed from WebSocket
   - Caller → target with capability and status
   - Timestamps in Share Tech Mono
   - Auto-scroll with most recent at top
-  - 60-second rolling window (V1)
+  - Rolling event buffer (max 100 events)
 
-- [ ] **FlagsPanel component**
+- [x] **FlagsPanel component**
   - All current MystWeaver flag values
   - Status dots (active/inactive)
   - Inline editor: click → input + APPLY button (no modal)
-  - Optimistic update + PATCH via Verika
+  - Optimistic update + PATCH with rollback on failure
 
-- [ ] **MetricsPanel component**
+- [x] **MetricsPanel component**
   - Grafana embedded via iframe
   - Fixed 15-minute window (V1)
   - Themed to be visually indistinguishable from React shell
   - Kiosk mode, dark theme
 
-- [ ] **WebSocket client**
-  - Auto-reconnect with 3-second backoff
+- [x] **WebSocket client**
+  - Auto-reconnect with exponential backoff (3s → 30s max)
+  - Health check gate before connection
   - Typed message dispatch to Zustand stores
   - AUTH → SUBSCRIBE flow on connect
   - Channel-based subscriptions: session, flags, assist, audit
 
-- [ ] **Zustand stores**
+- [x] **Zustand stores**
   - `sessionStore` — Room 404 session state
-  - `flagStore` — flag values with optimistic updates
+  - `flagStore` — flag values with optimistic updates + rollback
   - `assistStore` — suggestion lifecycle (set, confirm, dismiss)
   - `eventStore` — rolling event buffer (max 100 events)
 
-- [ ] **Varunai API: Data routes**
+- [x] **Varunai API: Data routes**
   - `GET /api/session/current` — proxy to Room 404
   - `GET /api/flags/current` — proxy to MystWeaver
   - `PATCH /api/flags/:key` — write via Verika
@@ -171,10 +172,10 @@ Everything is built to make that moment exceptional.
   - `GET /api/experiments/active` — proxy to MystWeaver
   - `WS /ws` — real-time event broadcast
 
-- [ ] **Pub/Sub integration**
+- [x] **Pub/Sub integration**
   - `POST /internal/pubsub/flag-updates` handler
   - Decode base64 message, broadcast FLAG_CHANGED to WS clients
-  - Sub-200ms flag change propagation to dashboard
+  - Zod validation on push message body
 
 ### Exit Criteria
 - Dashboard renders all four panels with live data

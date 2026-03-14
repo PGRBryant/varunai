@@ -34,6 +34,7 @@ jobs:
         run: pnpm --filter @varunai/client... build
         env:
           VITE_API_URL: https://varunai-api-qk3n3mly6q-uc.a.run.app
+          VITE_GRAFANA_URL: https://grafana-qk3n3mly6q-uc.a.run.app
 
       - id: auth
         uses: google-github-actions/auth@v2

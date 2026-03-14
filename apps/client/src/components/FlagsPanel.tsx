@@ -28,6 +28,9 @@ export function FlagsPanel() {
       <h2 className="label text-lg uppercase tracking-wider mb-3">Active Flags</h2>
 
       <div className="flex-1 overflow-auto flex flex-col gap-1">
+        {Object.keys(flags).length === 0 && (
+          <span className="label text-sm">Waiting for flags...</span>
+        )}
         {Object.entries(flags).map(([key, value]) => (
           <div
             key={key}
