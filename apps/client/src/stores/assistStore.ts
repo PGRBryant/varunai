@@ -21,6 +21,7 @@ export const useAssistStore = create<AssistStore>((set, get) => ({
       body: JSON.stringify({
         value: s.suggestedValue,
         reason: s.reasoning,
+        source: 'assist',
       }),
     }).catch(() => {
       // Silent

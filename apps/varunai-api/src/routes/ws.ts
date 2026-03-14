@@ -126,14 +126,22 @@ async function handleFlagChange(key: string, value: string | number | boolean): 
   try {
     const { patchFlag } = await import('../clients/mystweaver.js');
     const { recordFlagChange } = await import('../assist/context.js');
-    await patchFlag(key, String(value), 'Manual change from dashboard');
+    const result = await patchFlag(key, String(value), 'Manual change from dashboard');
+    broadcast({
+      type: 'FLAG_CHANGED',
+      key,
+      from: 'unknown',
+      to: result.newValue,
+      changedBy: 'dashboard',
+      traceId: result.traceId,
+    });
     recordFlagChange({
       flagKey: key,
       previousValue: undefined,
       newValue: value,
       changedBy: 'dashboard',
       timestamp: Date.now(),
-      traceId: crypto.randomUUID(),
+      traceId: result.traceId,
     });
   } catch {
     // Silent failure

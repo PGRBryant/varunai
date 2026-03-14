@@ -1,4 +1,4 @@
-import type { FlagValue } from '@varunai/shared';
+import type { FlagValue, Experiment } from '@varunai/shared';
 import { config } from '../config.js';
 
 interface FlagConfig {
@@ -56,10 +56,10 @@ export async function fetchAuditLog(projectId: string): Promise<AuditEntry[]> {
   return (await res.json()) as AuditEntry[];
 }
 
-export async function fetchExperiments(): Promise<unknown[]> {
+export async function fetchExperiments(): Promise<Experiment[]> {
   const res = await fetch(`${config.MYSTWEAVER_API_URL}/api/experiments`, {
     headers: { Authorization: `Bearer ${config.VERIKA_SERVICE_TOKEN}` },
   });
   if (!res.ok) throw new Error(`MystWeaver experiments: ${res.status}`);
-  return (await res.json()) as unknown[];
+  return (await res.json()) as Experiment[];
 }

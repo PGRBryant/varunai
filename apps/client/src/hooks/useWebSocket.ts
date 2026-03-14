@@ -81,6 +81,18 @@ export function useWebSocket(): void {
             case 'ASSIST_SUGGESTION':
               useAssistStore.getState().setSuggestion(msg.suggestion);
               break;
+            case 'ASSIST_APPLIED':
+              // Surface in trace feed so the full Gemini → flag change flow is visible
+              useEventStore.getState().addEvent({
+                type: 'AUDIT_EVENT',
+                caller: 'gemini-assist',
+                target: msg.flagKey,
+                capability: 'flag.write',
+                allowed: true,
+                traceId: msg.traceId,
+                timestamp: Date.now(),
+              });
+              break;
             case 'AUDIT_EVENT':
               useEventStore.getState().addEvent(msg);
               break;

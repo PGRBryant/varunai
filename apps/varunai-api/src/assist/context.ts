@@ -1,7 +1,42 @@
 import type { AssistContext } from '@varunai/shared';
-import { fetchFlags } from '../clients/mystweaver.js';
+import { fetchFlags, fetchExperiments } from '../clients/mystweaver.js';
 import { fetchCurrentSession } from '../clients/room404.js';
 
+// ── In-process metric counters (sliding 60s window) ──────────────
+interface MetricSample {
+  timestamp: number;
+  value: number;
+}
+
+const metricWindows: Record<string, MetricSample[]> = {
+  aiTimeout: [],
+  flagEval: [],
+  error: [],
+};
+
+const METRIC_WINDOW_MS = 60_000;
+
+type MetricName = 'aiTimeout' | 'flagEval' | 'error';
+
+export function recordMetric(name: MetricName, value = 1): void {
+  const samples = metricWindows[name]!;
+  samples.push({ timestamp: Date.now(), value });
+  const cutoff = Date.now() - METRIC_WINDOW_MS;
+  while (samples.length > 0 && samples[0]!.timestamp < cutoff) {
+    samples.shift();
+  }
+}
+
+function getRate(name: MetricName): number {
+  const samples = metricWindows[name]!;
+  const cutoff = Date.now() - METRIC_WINDOW_MS;
+  while (samples.length > 0 && samples[0]!.timestamp < cutoff) {
+    samples.shift();
+  }
+  return samples.reduce((sum, s) => sum + s.value, 0);
+}
+
+// ── Recent flag changes (sliding 90s window) ────────────────────
 const recentChanges: Array<{
   flagKey: string;
   previousValue: unknown;
@@ -21,9 +56,10 @@ export function recordFlagChange(change: (typeof recentChanges)[number]): void {
 }
 
 export async function buildAssistContext(): Promise<AssistContext> {
-  const [session, flags] = await Promise.all([
+  const [session, flags, experiments] = await Promise.all([
     fetchCurrentSession(),
-    fetchFlags(),
+    fetchFlags().then((f) => { recordMetric('flagEval'); return f; }),
+    fetchExperiments().catch(() => []),
   ]);
 
   const stuckThreshold = 7;
@@ -52,12 +88,12 @@ export async function buildAssistContext(): Promise<AssistContext> {
     },
     metrics: {
       roomCompletionRate: session.completionRate,
-      aiTimeoutRate: 0, // TODO: pull from Prometheus
-      flagEvalRate: 0,   // TODO: pull from Prometheus
-      errorRate: 0,       // TODO: pull from Prometheus
+      aiTimeoutRate: getRate('aiTimeout'),
+      flagEvalRate: getRate('flagEval'),
+      errorRate: getRate('error'),
     },
     experimentState: {
-      active: [],
+      active: experiments.filter((e) => e.status === 'running'),
       recentResults: [],
     },
   };

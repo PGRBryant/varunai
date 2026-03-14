@@ -1,11 +1,13 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { fetchFlags, patchFlag } from '../clients/mystweaver.js';
+import { recordFlagChange } from '../assist/context.js';
 import { broadcast } from './ws.js';
 
 const patchSchema = z.object({
   value: z.union([z.string(), z.number(), z.boolean()]),
   reason: z.string().optional(),
+  source: z.enum(['manual', 'assist']).optional(),
 });
 
 export const flagRoutes: FastifyPluginAsync = async (app) => {
@@ -28,14 +30,36 @@ export const flagRoutes: FastifyPluginAsync = async (app) => {
 
     try {
       const result = await patchFlag(key, parsed.data.value, parsed.data.reason ?? '');
+      const isAssist = parsed.data.source === 'assist';
+      const changedBy = isAssist ? 'gemini-assist' : 'presenter';
+
       broadcast({
         type: 'FLAG_CHANGED',
         key,
         from: 'unknown',
         to: result.newValue,
-        changedBy: 'presenter',
+        changedBy,
         traceId: result.traceId,
       });
+
+      if (isAssist) {
+        broadcast({
+          type: 'ASSIST_APPLIED',
+          flagKey: key,
+          newValue: result.newValue,
+          traceId: result.traceId,
+        });
+      }
+
+      recordFlagChange({
+        flagKey: key,
+        previousValue: 'unknown',
+        newValue: result.newValue,
+        changedBy,
+        timestamp: Date.now(),
+        traceId: result.traceId,
+      });
+
       return reply.send(result);
     } catch (err) {
       app.log.error(err, 'Failed to patch flag');

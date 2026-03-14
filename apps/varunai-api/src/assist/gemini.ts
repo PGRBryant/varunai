@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { AssistSuggestion, AssistContext } from '@varunai/shared';
 import { config } from '../config.js';
 import { PROACTIVE_SYSTEM_PROMPT, REACTIVE_SYSTEM_PROMPT, buildUserPrompt } from './prompts/index.js';
+import { recordMetric } from './context.js';
 
 const genAI = new GoogleGenerativeAI(config.GEMINI_API_KEY);
 
@@ -44,6 +45,11 @@ export async function generateSuggestion(
   } catch (err) {
     if (err instanceof Error) {
       console.error('[assist] Gemini call failed:', err.message);
+      if (err.message === 'Gemini call timed out') {
+        recordMetric('aiTimeout');
+      } else {
+        recordMetric('error');
+      }
     }
     return null;
   }
