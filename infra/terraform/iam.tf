@@ -39,3 +39,31 @@ resource "google_project_iam_member" "varunai_logging_viewer" {
   role    = "roles/logging.viewer"
   member  = "serviceAccount:${google_service_account.varunai_api.email}"
 }
+
+# Artifact Registry Writer (CI/CD docker push)
+resource "google_project_iam_member" "varunai_ar_writer" {
+  project = var.project_id
+  role    = "roles/artifactregistry.writer"
+  member  = "serviceAccount:${google_service_account.varunai_api.email}"
+}
+
+# Cloud Run Developer (CI/CD deploy)
+resource "google_project_iam_member" "varunai_run_developer" {
+  project = var.project_id
+  role    = "roles/run.developer"
+  member  = "serviceAccount:${google_service_account.varunai_api.email}"
+}
+
+# Firebase Hosting Admin (CI/CD client deploy)
+resource "google_project_iam_member" "varunai_firebase_hosting" {
+  project = var.project_id
+  role    = "roles/firebasehosting.admin"
+  member  = "serviceAccount:${google_service_account.varunai_api.email}"
+}
+
+# Service Account User (required for Cloud Run deployments)
+resource "google_project_iam_member" "varunai_sa_user" {
+  project = var.project_id
+  role    = "roles/iam.serviceAccountUser"
+  member  = "serviceAccount:${google_service_account.varunai_api.email}"
+}

@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths: ['apps/varunai-api/**', 'packages/shared/**']
 
+concurrency:
+  group: deploy-api
+  cancel-in-progress: false
+
 permissions:
   contents: read
   id-token: write
@@ -26,8 +30,12 @@ jobs:
       - name: Build and push Docker image
         run: |
           gcloud auth configure-docker us-central1-docker.pkg.dev
-          docker build -t us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:${{ github.sha }} .
-          docker push us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:${{ github.sha }}
+          docker build \
+            -f apps/varunai-api/Dockerfile \
+            -t us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:${{ github.sha }} \
+            -t us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:latest \
+            .
+          docker push us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api --all-tags
 
       - name: Deploy to Cloud Run
         run: |

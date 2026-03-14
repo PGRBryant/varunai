@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths: ['apps/client/**', 'packages/shared/**']
 
+concurrency:
+  group: deploy-client
+  cancel-in-progress: false
+
 permissions:
   contents: read
   id-token: write
@@ -25,10 +29,17 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @varunai/client build
 
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - name: Build client (includes shared via turbo)
+        run: pnpm --filter @varunai/client... build
+        env:
+          VITE_API_URL: https://varunai-api-qk3n3mly6q-uc.a.run.app
+
+      - id: auth
+        uses: google-github-actions/auth@v2
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          channelId: live
+          workload_identity_provider: projects/${{ vars.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: varunai-api@varunai-490119.iam.gserviceaccount.com
+
+      - name: Deploy to Firebase Hosting
+        run: npx firebase-tools deploy --only hosting --project varunai-490119
