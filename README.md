@@ -20,8 +20,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/anthropics/varunai/actions/workflows/ci.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/anthropics/varunai/ci.yml?label=CI&style=flat-square" alt="CI" />
+  <a href="https://github.com/PGRBryant/varunai/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/PGRBryant/varunai/ci.yml?label=CI&style=flat-square" alt="CI" />
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square" alt="License" />
@@ -45,7 +45,7 @@ The name plays on three things:
 - **AI** — Gemini powers the intelligence layer
 - **Eye** — the literal function, stated plainly
 
-Varunai is paired with [Verika](https://github.com/anthropics/verika) (identity). Verika answers *"What are you?"* Varunai answers *"What are you doing?"*
+Varunai is paired with [Verika](https://github.com/PGRBryant/verika) (identity). Verika answers *"What are you?"* Varunai answers *"What are you doing?"*
 
 ---
 
@@ -169,7 +169,7 @@ The presenter confirms. The flag propagates through MystWeaver to 47 live player
 
 ```bash
 # Clone
-git clone https://github.com/anthropics/varunai.git
+git clone https://github.com/PGRBryant/varunai.git
 cd varunai
 
 # Install dependencies
@@ -207,13 +207,24 @@ cd infra/terraform
 terraform init
 terraform apply
 
-# Deploy API to Cloud Run
-gcloud run deploy varunai-api --source .
+# Build and push the API Docker image
+docker build -t us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:latest \
+  -f apps/varunai-api/Dockerfile .
+docker push us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:latest
+
+# Update Cloud Run to use the new image
+gcloud run services update varunai-api \
+  --image us-central1-docker.pkg.dev/varunai-490119/varunai-images/varunai-api:latest \
+  --region us-central1
 
 # Deploy client to Firebase
 pnpm --filter @varunai/client build
 firebase deploy --only hosting
 ```
+
+**Live endpoints:**
+- API: `https://varunai-api-qk3n3mly6q-uc.a.run.app`
+- Health: `https://varunai-api-qk3n3mly6q-uc.a.run.app/health`
 
 ---
 
@@ -280,7 +291,7 @@ See the [Roadmap](ROADMAP.md) for the full phased plan. The immediate next steps
 ## License
 
 ```
-Copyright 2024 Varunai Contributors
+Copyright 2026 Varunai Contributors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

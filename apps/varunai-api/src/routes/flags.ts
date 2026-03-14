@@ -31,7 +31,7 @@ export const flagRoutes: FastifyPluginAsync = async (app) => {
       broadcast({
         type: 'FLAG_CHANGED',
         key,
-        from: null as unknown as string,
+        from: 'unknown',
         to: result.newValue,
         changedBy: 'presenter',
         traceId: result.traceId,

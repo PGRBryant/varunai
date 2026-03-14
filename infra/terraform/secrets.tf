@@ -25,3 +25,25 @@ resource "google_secret_manager_secret" "otel_collector_config" {
     auto {}
   }
 }
+
+# ── Placeholder secret versions (replace with real values later) ──
+
+resource "google_secret_manager_secret_version" "gemini_api_key" {
+  secret      = google_secret_manager_secret.gemini_api_key.id
+  secret_data = "PLACEHOLDER_REPLACE_ME"
+}
+
+resource "google_secret_manager_secret_version" "grafana_admin_password" {
+  secret      = google_secret_manager_secret.grafana_admin_password.id
+  secret_data = "admin"
+}
+
+resource "google_secret_manager_secret_version" "grafana_secret_key" {
+  secret      = google_secret_manager_secret.grafana_secret_key.id
+  secret_data = "varunai-grafana-secret"
+}
+
+resource "google_secret_manager_secret_version" "otel_collector_config" {
+  secret      = google_secret_manager_secret.otel_collector_config.id
+  secret_data = "# placeholder otel config"
+}

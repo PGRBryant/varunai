@@ -4,9 +4,11 @@ resource "google_cloud_run_v2_service" "varunai_api" {
   name     = "varunai-api"
   location = var.region
 
+  depends_on = [google_secret_manager_secret_version.gemini_api_key]
+
   template {
     scaling {
-      min_instance_count = 1
+      min_instance_count = 0
       max_instance_count = 5
     }
 
@@ -57,14 +59,16 @@ resource "google_cloud_run_v2_service" "otel_collector" {
   name     = "otel-collector"
   location = var.region
 
+  depends_on = [google_secret_manager_secret_version.otel_collector_config]
+
   template {
     scaling {
-      min_instance_count = 1
+      min_instance_count = 0
       max_instance_count = 3
     }
 
     containers {
-      image = "otel/opentelemetry-collector-contrib:latest"
+      image = "gcr.io/cloudrun/hello:latest"
 
       resources {
         limits = {
@@ -98,9 +102,14 @@ resource "google_cloud_run_v2_service" "grafana" {
   name     = "grafana"
   location = var.region
 
+  depends_on = [
+    google_secret_manager_secret_version.grafana_admin_password,
+    google_secret_manager_secret_version.grafana_secret_key,
+  ]
+
   template {
     scaling {
-      min_instance_count = 1
+      min_instance_count = 0
       max_instance_count = 1
     }
 

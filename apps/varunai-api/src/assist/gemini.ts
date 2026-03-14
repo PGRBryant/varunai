@@ -38,8 +38,11 @@ export async function generateSuggestion(
     if (!parsed.flagKey || typeof parsed.confidence !== 'number') return null;
 
     return parsed;
-  } catch {
+  } catch (err) {
     clearTimeout(timeout);
-    return null; // Silent failure — retry next cycle
+    if (err instanceof Error && err.name !== 'AbortError') {
+      console.error('[assist] Gemini call failed:', err.message);
+    }
+    return null;
   }
 }

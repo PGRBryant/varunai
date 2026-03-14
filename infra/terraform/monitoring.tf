@@ -61,19 +61,18 @@ resource "google_monitoring_uptime_check_config" "otel_collector" {
   }
 }
 
-resource "google_monitoring_alert_policy" "gemini_errors" {
-  display_name = "Gemini API Error Rate > 20%"
-  combiner     = "OR"
-
-  conditions {
-    display_name = "Gemini error rate"
-    condition_threshold {
-      filter          = "resource.type = \"cloud_run_revision\" AND resource.labels.service_name = \"varunai-api\" AND metric.type = \"logging.googleapis.com/user/varunai_assist_errors\""
-      duration        = "300s"
-      comparison      = "COMPARISON_GT"
-      threshold_value = 0.2
-    }
-  }
-
-  notification_channels = []
-}
+# Alert policy for Gemini errors - deferred until custom metric exists
+# resource "google_monitoring_alert_policy" "gemini_errors" {
+#   display_name = "Gemini API Error Rate > 20%"
+#   combiner     = "OR"
+#   conditions {
+#     display_name = "Gemini error rate"
+#     condition_threshold {
+#       filter          = "resource.type = \"cloud_run_revision\" AND resource.labels.service_name = \"varunai-api\" AND metric.type = \"logging.googleapis.com/user/varunai_assist_errors\""
+#       duration        = "300s"
+#       comparison      = "COMPARISON_GT"
+#       threshold_value = 0.2
+#     }
+#   }
+#   notification_channels = []
+# }

@@ -11,9 +11,9 @@ export function TraceFeedPanel() {
         {events.length === 0 ? (
           <span className="label text-sm">Waiting for events...</span>
         ) : (
-          events.map((event, i) => (
+          events.map((event) => (
             <div
-              key={i}
+              key={`${event.timestamp}-${event.caller}-${event.target}`}
               className="flex items-start gap-3 py-1 border-b border-bureaucrat-grey/20 text-sm"
             >
               <span className="timestamp text-xs whitespace-nowrap">

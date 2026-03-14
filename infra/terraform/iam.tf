@@ -24,6 +24,15 @@ resource "google_project_iam_member" "varunai_trace_user" {
   member  = "serviceAccount:${google_service_account.varunai_api.email}"
 }
 
+# Allow unauthenticated access to Cloud Run (Verika handles app-level auth)
+resource "google_cloud_run_v2_service_iam_member" "varunai_api_public" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.varunai_api.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
 # Cloud Logging
 resource "google_project_iam_member" "varunai_logging_viewer" {
   project = var.project_id

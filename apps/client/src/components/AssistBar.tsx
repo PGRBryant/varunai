@@ -16,12 +16,13 @@ export function AssistBar() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: query }),
       });
+      if (!res.ok) return;
       const data = await res.json();
-      if (data) {
+      if (data?.flagKey) {
         useAssistStore.getState().setSuggestion(data);
       }
     } catch {
-      // Silent
+      // Network error — assist is non-critical, fail silently
     }
     setQuery('');
   };

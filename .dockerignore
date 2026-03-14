@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.github
+*.md
+apps/client
+grafana
+otel-collector
+infra
+docs
+.turbo
