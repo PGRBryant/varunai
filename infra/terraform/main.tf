@@ -40,12 +40,12 @@ variable "region" {
 
 variable "verika_endpoint" {
   description = "Verika API endpoint URL"
-  default     = "https://verika-api-722466371905.us-east1.run.app"
+  default     = "https://verika-api-hdzhlg4y7a-ue.a.run.app"
 }
 
 variable "verika_service_id" {
   description = "Service ID registered in Verika's service registry"
-  default     = "varunai-api"
+  default     = "varunai"
 }
 
 variable "mystweaver_api_url" {

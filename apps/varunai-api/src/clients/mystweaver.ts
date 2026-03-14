@@ -1,12 +1,6 @@
 import type { FlagValue, Experiment } from '@varunai/shared';
 import { config } from '../config.js';
 
-interface FlagConfig {
-  key: string;
-  value: FlagValue;
-  type: string;
-}
-
 interface AuditEntry {
   id: string;
   action: string;
@@ -16,13 +10,22 @@ interface AuditEntry {
   metadata: Record<string, unknown>;
 }
 
+/** SDK endpoints use the MystWeaver SDK key; admin API endpoints use the Verika service token. */
+function sdkHeaders(): Record<string, string> {
+  return { Authorization: `Bearer ${config.MYSTWEAVER_SDK_KEY}` };
+}
+
+function adminHeaders(): Record<string, string> {
+  return { Authorization: `Bearer ${config.VERIKA_SERVICE_TOKEN}` };
+}
+
 export async function fetchFlags(): Promise<Record<string, FlagValue>> {
   const res = await fetch(`${config.MYSTWEAVER_API_URL}/sdk/flags`, {
-    headers: { Authorization: `Bearer ${config.VERIKA_SERVICE_TOKEN}` },
+    headers: sdkHeaders(),
   });
   if (!res.ok) throw new Error(`MystWeaver flags: ${res.status}`);
-  const flags = (await res.json()) as FlagConfig[];
-  return Object.fromEntries(flags.map((f) => [f.key, f.value]));
+  const data = (await res.json()) as { flags: Record<string, FlagValue> };
+  return data.flags;
 }
 
 export async function patchFlag(
@@ -34,7 +37,7 @@ export async function patchFlag(
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${config.VERIKA_SERVICE_TOKEN}`,
+      ...adminHeaders(),
     },
     body: JSON.stringify({ value, reason }),
   });
@@ -50,7 +53,7 @@ export async function patchFlag(
 export async function fetchAuditLog(projectId: string): Promise<AuditEntry[]> {
   const res = await fetch(
     `${config.MYSTWEAVER_API_URL}/api/audit?projectId=${encodeURIComponent(projectId)}`,
-    { headers: { Authorization: `Bearer ${config.VERIKA_SERVICE_TOKEN}` } }
+    { headers: adminHeaders() }
   );
   if (!res.ok) throw new Error(`MystWeaver audit: ${res.status}`);
   return (await res.json()) as AuditEntry[];
@@ -58,7 +61,7 @@ export async function fetchAuditLog(projectId: string): Promise<AuditEntry[]> {
 
 export async function fetchExperiments(): Promise<Experiment[]> {
   const res = await fetch(`${config.MYSTWEAVER_API_URL}/api/experiments`, {
-    headers: { Authorization: `Bearer ${config.VERIKA_SERVICE_TOKEN}` },
+    headers: adminHeaders(),
   });
   if (!res.ok) throw new Error(`MystWeaver experiments: ${res.status}`);
   return (await res.json()) as Experiment[];

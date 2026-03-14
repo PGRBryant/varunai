@@ -57,22 +57,21 @@ export function recordFlagChange(change: (typeof recentChanges)[number]): void {
 
 export async function buildAssistContext(): Promise<AssistContext> {
   const [session, flags, experiments] = await Promise.all([
-    fetchCurrentSession(),
+    fetchCurrentSession().catch(() => null),
     fetchFlags().then((f) => { recordMetric('flagEval'); return f; }),
     fetchExperiments().catch(() => []),
   ]);
 
-  const stuckThreshold = 7;
-  const stuckPlayerCount = session.players.filter(
-    (p) => p.isAlive && p.floor < stuckThreshold
-  ).length;
+  const stuckPlayerCount = session
+    ? session.players.filter((p) => p.isAlive && p.floor < 7).length
+    : 0;
 
   return {
     session: {
-      playerCount: session.playerCount,
-      floorDistribution: session.floorDistribution,
-      completionRate: session.completionRate,
-      averageScore: session.averageScore,
+      playerCount: session?.playerCount ?? 0,
+      floorDistribution: session?.floorDistribution ?? {},
+      completionRate: session?.completionRate ?? 0,
+      averageScore: session?.averageScore ?? 0,
       stuckPlayerCount,
     },
     flags: {
@@ -87,7 +86,7 @@ export async function buildAssistContext(): Promise<AssistContext> {
       })),
     },
     metrics: {
-      roomCompletionRate: session.completionRate,
+      roomCompletionRate: session?.completionRate ?? 0,
       aiTimeoutRate: getRate('aiTimeout'),
       flagEvalRate: getRate('flagEval'),
       errorRate: getRate('error'),
