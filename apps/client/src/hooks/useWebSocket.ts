@@ -5,7 +5,7 @@ import { useFlagStore } from '../stores/flagStore';
 import { useAssistStore } from '../stores/assistStore';
 import { useEventStore } from '../stores/eventStore';
 
-const RECONNECT_DELAY = 3000;
+const MAX_RECONNECT_DELAY = 30_000;
 
 function getWsUrl(): string {
   // In dev, proxy through Vite to localhost API
@@ -24,14 +24,30 @@ export function useWebSocket(): void {
   useEffect(() => {
     let reconnectTimer: ReturnType<typeof setTimeout>;
     let disposed = false;
+    let reconnectDelay = 3000;
 
-    function connect() {
+    async function connect() {
       if (disposed) return;
+
+      // Gate: check API health before attempting WebSocket connection
+      try {
+        const apiUrl = import.meta.env.DEV
+          ? ''
+          : (import.meta.env.VITE_API_URL || 'https://varunai-api-qk3n3mly6q-uc.a.run.app');
+        const res = await fetch(`${apiUrl}/health`, { signal: AbortSignal.timeout(5000) });
+        if (!res.ok) throw new Error('API not ready');
+      } catch {
+        // API not reachable — back off and retry later
+        reconnectDelay = Math.min(reconnectDelay * 2, MAX_RECONNECT_DELAY);
+        reconnectTimer = setTimeout(() => void connect(), reconnectDelay);
+        return;
+      }
 
       const ws = new WebSocket(getWsUrl());
       wsRef.current = ws;
 
       ws.onopen = () => {
+        reconnectDelay = 3000; // Reset backoff on successful connection
         ws.send(JSON.stringify({ type: 'AUTH', token: 'dev-token' }));
         ws.send(
           JSON.stringify({
@@ -76,7 +92,7 @@ export function useWebSocket(): void {
 
       ws.onclose = () => {
         if (!disposed) {
-          reconnectTimer = setTimeout(connect, RECONNECT_DELAY);
+          reconnectTimer = setTimeout(() => void connect(), reconnectDelay);
         }
       };
 
@@ -85,7 +101,7 @@ export function useWebSocket(): void {
       };
     }
 
-    connect();
+    void connect();
 
     return () => {
       disposed = true;
