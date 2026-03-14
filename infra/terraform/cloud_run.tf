@@ -7,6 +7,7 @@ resource "google_cloud_run_v2_service" "varunai_api" {
   depends_on = [
     google_secret_manager_secret_version.gemini_api_key,
     google_secret_manager_secret_version.verika_service_token,
+    google_secret_manager_secret_version.mystweaver_sdk_key,
   ]
 
   template {
@@ -73,6 +74,16 @@ resource "google_cloud_run_v2_service" "varunai_api" {
       env {
         name  = "MYSTWEAVER_API_URL"
         value = var.mystweaver_api_url
+      }
+
+      env {
+        name = "MYSTWEAVER_SDK_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.mystweaver_sdk_key.secret_id
+            version = "latest"
+          }
+        }
       }
 
       env {
