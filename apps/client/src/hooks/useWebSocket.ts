@@ -7,6 +7,17 @@ import { useEventStore } from '../stores/eventStore';
 
 const RECONNECT_DELAY = 3000;
 
+function getWsUrl(): string {
+  // In dev, proxy through Vite to localhost API
+  if (import.meta.env.DEV) {
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    return `${protocol}://${window.location.host}/ws`;
+  }
+  // In production, connect directly to Cloud Run (Firebase Hosting doesn't proxy WebSockets)
+  const apiUrl = import.meta.env.VITE_API_URL || 'https://varunai-api-qk3n3mly6q-uc.a.run.app';
+  return apiUrl.replace(/^http/, 'ws') + '/ws';
+}
+
 export function useWebSocket(): void {
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -17,8 +28,7 @@ export function useWebSocket(): void {
     function connect() {
       if (disposed) return;
 
-      const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-      const ws = new WebSocket(`${protocol}://${window.location.host}/ws`);
+      const ws = new WebSocket(getWsUrl());
       wsRef.current = ws;
 
       ws.onopen = () => {
