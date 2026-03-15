@@ -43,6 +43,7 @@ export function broadcast(event: ServerEvent): void {
         ASSIST_APPLIED: 'assist',
         METRIC_UPDATE: 'session',
         AUDIT_EVENT: 'audit',
+        VERIKA_ALERT: 'audit',
       };
       const channel = channelMap[event.type];
       if (!channel || client.channels.has(channel)) {

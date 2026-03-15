@@ -12,6 +12,7 @@ const envSchema = z.object({
   GRAFANA_URL: z.string().default('http://localhost:3000'),
   GCP_PROJECT_ID: z.string().default('varunai-490119'),
   NODE_ENV: z.string().default('development'),
+  VERIKA_WEBHOOK_SECRET: z.string().default(''),
 });
 
 export type Config = z.infer<typeof envSchema>;
