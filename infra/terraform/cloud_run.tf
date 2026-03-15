@@ -8,6 +8,8 @@ resource "google_cloud_run_v2_service" "varunai_api" {
     google_secret_manager_secret_version.gemini_api_key,
     google_secret_manager_secret_version.verika_service_token,
     google_secret_manager_secret_version.mystweaver_sdk_key,
+    # verika-webhook-secret lives in verika-490105 — no local version resource,
+    # but the SA IAM binding is applied by Verika's Terraform before apply here
   ]
 
   template {
@@ -89,6 +91,16 @@ resource "google_cloud_run_v2_service" "varunai_api" {
       env {
         name  = "ROOM404_API_URL"
         value = var.room404_api_url
+      }
+
+      env {
+        name = "VERIKA_WEBHOOK_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = "projects/verika-490105/secrets/verika-webhook-secret"
+            version = "latest"
+          }
+        }
       }
 
       ports {
