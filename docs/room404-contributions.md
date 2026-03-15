@@ -9,7 +9,8 @@
 
 | PR | Branch | Status | Description |
 |----|--------|--------|-------------|
-| [PGRBryant/room404#1](https://github.com/PGRBryant/room404/pull/1) | `feat/presenter-redesign` | Open | Presenter screen redesign for projector display |
+| [PGRBryant/room404#1](https://github.com/PGRBryant/room404/pull/1) | `feat/presenter-redesign` | Merged | Presenter screen redesign for projector display |
+| [PGRBryant/room404#2](https://github.com/PGRBryant/room404/pull/2) | `feat/death-experience-redesign` | Open | Death experience redesign — ghost spectator + steal animation |
 
 ---
 
