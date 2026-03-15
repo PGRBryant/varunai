@@ -23,35 +23,21 @@ _(None yet)_
 
 **Goal:** Replace the functional-but-flat `/presenter` view with a cinematic, Jackbox.tv-style experience optimized for 1920x1080 projection.
 
-**Files changed:**
-- `apps/client/src/screens/PresenterScreen.tsx` — complete rewrite
-- `apps/client/src/copy/uiCopy.ts` — new presenter copy strings
+**Two commits — lobby redesign + narrative feed.**
 
-**What changed:**
+### Commit 1: Cinematic Lobby + Countdown
+- Large DepartmentSeal, glowing title, oversized room code characters, QR code
+- Animated soul counter, player name chips, pulsing "SEAL THEIR FATE" button
+- Full-screen 3-2-1 countdown overlay with scale animation
 
-### Lobby Phase (pre-game)
-- Large DepartmentSeal (160px) with "Department of Eternal Processing"
-- Glowing ROOM 404 title (Cinzel Decorative, 72px, ember-gold text-shadow)
-- Room code in oversized individual character boxes (spirit-teal glow, 120px mono)
-- QR code card alongside room code for audience to scan
-- Animated soul counter that scales on player join
-- Player name chips in a flex-wrap grid — border turns spirit-teal when READY
-- Pulsing "SEAL THEIR FATE" button with ember-gold glow animation
-- Radial gradient background (void-black → purgatory-purple)
+### Commit 2: Narrative Feed — "The Building Speaks" (full-stack)
+- New `PRESENTER_EVENT` shared type (8 event kinds)
+- Server broadcasts narrative events (memories, dilemmas, whispers, eliminations)
+- 3-column active game layout: Narrative Feed (25%) | Leaderboard (40%) | Building Speaks (35%)
+- Cooperation meter + door integrity meter in header/sidebar
+- Memory events in cursed font, dilemma outcome cards, whispers
 
-### Countdown Phase (game starting)
-- Full-screen overlay with countdown number (200px, spirit-teal, scale animation)
-- Each number animates in with scale 2→1, exits with scale 1→0.5
-- "PREPARING YOUR DESCENT..." pulsing text
-
-### Active Game Phase
-- Compact header bar: seal, title, floor progress (ROOM X / 15), soul count, room code, state badge
-- 70/30 split layout:
-  - **Leaderboard** (70%): Score progress bars (relative to max), rank transition animations via `layout`, top-3 styling (gold/silver/bronze), delta values in teal/red, large readable fonts
-  - **Event feed** (30%): Color-coded entries (info/good/bad), timestamps, auto-scroll, 30-entry rolling buffer
-
-### Technical approach
-- No new dependencies, stores, or routes
+**Files changed:** `types.ts`, `handler.ts`, `PresenterScreen.tsx`, `gameStore.ts`, `messageHandler.ts`, `uiCopy.ts`
 - Same WebSocket/session init flow as original
 - View switching via `AnimatePresence` keyed on `sessionState` + `countdown`
 - All styling uses existing Room 404 design tokens and Tailwind config
