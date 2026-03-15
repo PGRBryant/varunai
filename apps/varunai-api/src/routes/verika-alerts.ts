@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'node:crypto';
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { config } from '../config.js';
@@ -17,10 +18,12 @@ const gcpIncidentSchema = z.object({
 
 export const verikaAlertRoutes: FastifyPluginAsync = async (app) => {
   app.post('/alerts', async (request, reply) => {
-    const authHeader = request.headers.authorization;
+    const authHeader = request.headers.authorization ?? '';
+    const expected = `Bearer ${config.VERIKA_WEBHOOK_SECRET}`;
     if (
       !config.VERIKA_WEBHOOK_SECRET ||
-      authHeader !== `Bearer ${config.VERIKA_WEBHOOK_SECRET}`
+      authHeader.length !== expected.length ||
+      !timingSafeEqual(Buffer.from(authHeader), Buffer.from(expected))
     ) {
       return reply.status(401).send();
     }
