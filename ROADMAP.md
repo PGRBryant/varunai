@@ -308,6 +308,12 @@ These features are specified in detail but not implemented. Each has a trigger c
 
 ---
 
+## Upstream Contributions
+
+Varunai contributes UI and integration work to the Room 404 codebase when it improves the demo experience. Tracked separately in [docs/room404-contributions.md](docs/room404-contributions.md).
+
+---
+
 ## How to Track Progress
 
 This roadmap uses GitHub Issues for tracking. Each task above maps to an issue labeled with its phase:
