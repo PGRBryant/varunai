@@ -50,13 +50,25 @@ export interface AuditEvent {
   timestamp: number;
 }
 
+export interface VerikaAlertEvent {
+  type: 'VERIKA_ALERT';
+  incidentId: string;
+  alertName: string;
+  state: 'open' | 'closed';
+  summary: string;
+  startedAt: number;
+  endedAt: number | null;
+  url: string;
+}
+
 export type ServerEvent =
   | SessionUpdateEvent
   | FlagChangedEvent
   | AssistSuggestionEvent
   | AssistAppliedEvent
   | MetricUpdateEvent
-  | AuditEvent;
+  | AuditEvent
+  | VerikaAlertEvent;
 
 // ── Client → Server messages ──────────────────────────────────────
 

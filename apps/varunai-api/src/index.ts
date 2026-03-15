@@ -7,6 +7,7 @@ import { assistRoutes } from './routes/assist.js';
 import { auditRoutes } from './routes/audit.js';
 import { healthRoutes } from './routes/health.js';
 import { pubsubRoutes } from './routes/pubsub.js';
+import { verikaAlertRoutes } from './routes/verika-alerts.js';
 import { wsHandler } from './routes/ws.js';
 import { startAssistLoop } from './assist/loop.js';
 
@@ -24,6 +25,7 @@ async function main(): Promise<void> {
   await app.register(auditRoutes, { prefix: '/api/audit' });
   await app.register(healthRoutes);
   await app.register(pubsubRoutes, { prefix: '/internal/pubsub' });
+  await app.register(verikaAlertRoutes, { prefix: '/internal/verika' });
   await app.register(wsHandler);
 
   startAssistLoop();
