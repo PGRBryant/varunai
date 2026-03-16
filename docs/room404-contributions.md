@@ -10,7 +10,8 @@
 | PR | Branch | Status | Description |
 |----|--------|--------|-------------|
 | [PGRBryant/room404#1](https://github.com/PGRBryant/room404/pull/1) | `feat/presenter-redesign` | Merged | Presenter screen redesign for projector display |
-| [PGRBryant/room404#2](https://github.com/PGRBryant/room404/pull/2) | `feat/death-experience-redesign` | Open | Death experience redesign — ghost spectator + steal animation |
+| [PGRBryant/room404#2](https://github.com/PGRBryant/room404/pull/2) | `feat/death-experience-redesign` | Merged | Death experience redesign — ghost spectator + steal animation |
+| [PGRBryant/room404#3](https://github.com/PGRBryant/room404/pull/3) | `feat/game-modifiers-tier1` | Open | Game modifiers tier 1 — 5 presenter-triggered mid-game events |
 
 ---
 
