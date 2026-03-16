@@ -5,12 +5,11 @@
 #   1. Scales Varunai API, OTel Collector, and Grafana to maxInstances=1
 #      (they already have minInstances=0 so they'll drain to zero on idle)
 #   2. Reduces Varunai API CPU/memory to economy settings
-#   3. Throttles any GCP uptime checks to 1 h (prevents keepalive cold-starts)
 #
-# All Cloud Run services in this project use minInstances=0 (scale-to-zero),
-# so the main cost driver is keepalive traffic and over-provisioned limits.
+# Uptime checks have been removed from Terraform to prevent keepalive
+# cold-starts. Services now truly scale to zero when idle.
 #
-# Prerequisites: gcloud auth login (ADC), curl, node
+# Prerequisites: gcloud auth login (ADC)
 # Usage: bash scripts/wind-down.sh
 
 set -euo pipefail
@@ -51,37 +50,9 @@ gcloud run services update grafana \
   --max-instances=1 \
   --quiet 2>/dev/null && echo "  ✓ grafana confirmed" \
   || echo "  ⚠ grafana not deployed — skipping"
-echo ""
-
-# ── 4. Uptime checks → throttle to 1 h ─────────────────────────────────────
-echo "→ Checking for uptime monitors to throttle..."
-ACCESS_TOKEN=$(gcloud auth print-access-token)
-
-CHECKS=$(curl -sf \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
-  "https://monitoring.googleapis.com/v3/projects/${PROJECT}/uptimeCheckConfigs" \
-  | node -e "
-    const d = JSON.parse(require('fs').readFileSync(0, 'utf8'));
-    (d.uptimeCheckConfigs || []).forEach(c => console.log(c.name));
-  " 2>/dev/null || true)
-
-if [ -z "${CHECKS}" ]; then
-  echo "  (no uptime checks configured — nothing to throttle)"
-else
-  while IFS= read -r check; do
-    display=$(basename "${check}")
-    echo "  → Throttling ${display} to period=3600s..."
-    curl -sf -X PATCH \
-      -H "Authorization: Bearer ${ACCESS_TOKEN}" \
-      -H "Content-Type: application/json" \
-      -d '{"period":"3600s"}' \
-      "https://monitoring.googleapis.com/v3/${check}?updateMask=period" \
-      > /dev/null
-    echo "    ✓ Done"
-  done <<< "${CHECKS}"
-fi
 
 echo ""
 echo "=== Wind-down complete ==="
 echo "All services will drain to zero on their own (minInstances=0)."
+echo "No uptime checks — services stay at zero until the dashboard is opened."
 echo "Run scripts/wind-up.sh at the start of your next session."

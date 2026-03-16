@@ -32,6 +32,14 @@ const clientMessageSchema = z.discriminatedUnion('type', [
 
 const clients = new Set<ConnectedClient>();
 
+/** Returns true if at least one authenticated presenter is connected. */
+export function hasActiveClients(): boolean {
+  for (const client of clients) {
+    if (client.authenticated && client.socket.readyState === 1) return true;
+  }
+  return false;
+}
+
 export function broadcast(event: ServerEvent): void {
   const data = JSON.stringify(event);
   for (const client of clients) {
