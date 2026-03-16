@@ -30,6 +30,9 @@ export interface AssistContext {
     completionRate: number;
     averageScore: number;
     stuckPlayerCount: number;
+    cooperationRate?: number;
+    eliminatedCount?: number;
+    averageLives?: number;
   };
   flags: {
     current: Record<string, FlagValue>;

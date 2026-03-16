@@ -1,14 +1,26 @@
 import type { AssistContext } from '@varunai/shared';
 
-export const PROACTIVE_SYSTEM_PROMPT = `You are Varunai's intelligence layer. You watch a live multiplayer game session and advise the presenter on which feature flags to change to improve the player experience.
+export const PROACTIVE_SYSTEM_PROMPT = `You are Varunai's intelligence layer. You watch a live multiplayer game session and advise the presenter on which feature flags or game modifiers to change.
 
-The game is Room 404 — players complete absurd tasks on each floor of a haunted office elevator. Your goal is to keep the session energetic and entertaining for all players, especially during a live demo in front of an audience.
+The game is Room 404 — a multiplayer purgatory where players face moral dilemmas (cooperate or betray) then survive room challenges. Your goal is to keep the session dramatic and emotionally compelling during a live demo.
 
-When you suggest a flag change:
-- Suggest exactly one flag at a time
+You can suggest two types of changes:
+1. **Regular flags** — game settings like timer, lives, room toggles
+2. **Game modifiers** — dramatic one-shot or toggle events that transform the game mid-session:
+   - modifier.trust-dividend (one-shot): If cooperation > 70%, all players gain +1 life. If < 30%, all lose 1 life. Use when cooperation rate is near a threshold.
+   - modifier.soul-harvest (one-shot): Every living player loses 1 life. Use when game is too easy or you want a dramatic mid-game event.
+   - modifier.resurrection (one-shot): Revive all dead players with 1 life. Use when too many eliminations are deflating the audience.
+   - modifier.immortal-round (toggle): Room failures don't cost lives. Use as a safety valve after harsh events.
+   - modifier.reveal-souls (one-shot): Next dilemma shows real player names instead of soul IDs. Use once per game for maximum emotional impact.
+
+Modifiers are set to true to trigger them. One-shot modifiers auto-reset after firing.
+
+When you suggest a change:
+- Suggest exactly one flag or modifier at a time
 - Explain the reasoning in plain, confident English
 - Predict the effect on the session
 - Assign a confidence score between 0.0 and 1.0
+- Prefer modifiers over regular flags when the session needs a dramatic moment
 - Return null if no change is warranted
 
 Return ONLY valid JSON matching this schema, nothing else:
@@ -23,9 +35,16 @@ Return ONLY valid JSON matching this schema, nothing else:
 }
 or null if no change is warranted.`;
 
-export const REACTIVE_SYSTEM_PROMPT = `You are Varunai's intelligence layer. The presenter is asking you a direct question about the live game session. Analyze the session state and respond with a specific, actionable flag change suggestion.
+export const REACTIVE_SYSTEM_PROMPT = `You are Varunai's intelligence layer. The presenter is asking you a direct question about the live game session. Analyze the session state and respond with a specific, actionable flag change or game modifier suggestion.
 
-The game is Room 404 — players complete absurd tasks on each floor of a haunted office elevator. The presenter's question is your primary signal. Session state is supporting context.
+The game is Room 404 — a multiplayer purgatory with moral dilemmas and room challenges. The presenter's question is your primary signal. Session state is supporting context.
+
+Available game modifiers (set to true to trigger):
+- modifier.trust-dividend: Reward/punish based on cooperation rate threshold
+- modifier.soul-harvest: All players lose 1 life
+- modifier.resurrection: Revive all dead players
+- modifier.immortal-round: No lives lost on current floor (toggle)
+- modifier.reveal-souls: Next dilemma shows real names (use once)
 
 Return ONLY valid JSON matching this schema, nothing else:
 {
@@ -40,12 +59,21 @@ Return ONLY valid JSON matching this schema, nothing else:
 or null if no change is warranted.`;
 
 export function buildUserPrompt(context: AssistContext): string {
+  // Separate modifier flags from regular flags for clearer context
+  const modifierFlags = Object.entries(context.flags.current)
+    .filter(([key]) => key.startsWith('modifier.'));
+  const regularFlags = Object.entries(context.flags.current)
+    .filter(([key]) => !key.startsWith('modifier.'));
+
   return `Current session state:
 
 Players: ${context.session.playerCount}
 Completion rate: ${(context.session.completionRate * 100).toFixed(1)}%
 Average score: ${context.session.averageScore}
 Stuck players (below floor 7): ${context.session.stuckPlayerCount}
+${context.session.cooperationRate !== undefined ? `Cooperation rate: ${(context.session.cooperationRate * 100).toFixed(1)}%` : ''}
+${context.session.eliminatedCount !== undefined ? `Eliminated players: ${context.session.eliminatedCount}` : ''}
+${context.session.averageLives !== undefined ? `Average lives remaining: ${context.session.averageLives.toFixed(1)}` : ''}
 
 Floor distribution:
 ${Object.entries(context.session.floorDistribution)
@@ -53,10 +81,13 @@ ${Object.entries(context.session.floorDistribution)
   .map(([floor, count]) => `  Floor ${floor}: ${count} players`)
   .join('\n')}
 
+Game modifier states:
+${modifierFlags.length === 0
+  ? '  No modifiers available'
+  : modifierFlags.map(([key, value]) => `  ${key}: ${JSON.stringify(value)}`).join('\n')}
+
 Current flag values:
-${Object.entries(context.flags.current)
-  .map(([key, value]) => `  ${key}: ${JSON.stringify(value)}`)
-  .join('\n')}
+${regularFlags.map(([key, value]) => `  ${key}: ${JSON.stringify(value)}`).join('\n')}
 
 Recent flag changes (last 90 seconds):
 ${

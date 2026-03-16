@@ -66,6 +66,13 @@ export async function buildAssistContext(): Promise<AssistContext> {
     ? session.players.filter((p) => p.isAlive && p.floor < 7).length
     : 0;
 
+  // Compute modifier-relevant metrics from session data
+  const alivePlayers = session?.players.filter((p) => p.isAlive) ?? [];
+  const deadPlayers = session?.players.filter((p) => !p.isAlive) ?? [];
+  const averageLives = alivePlayers.length > 0
+    ? alivePlayers.reduce((sum, p) => sum + (p.livesRemaining ?? 0), 0) / alivePlayers.length
+    : undefined;
+
   return {
     session: {
       playerCount: session?.playerCount ?? 0,
@@ -73,6 +80,9 @@ export async function buildAssistContext(): Promise<AssistContext> {
       completionRate: session?.completionRate ?? 0,
       averageScore: session?.averageScore ?? 0,
       stuckPlayerCount,
+      cooperationRate: session?.cooperationRate,
+      eliminatedCount: deadPlayers.length > 0 ? deadPlayers.length : undefined,
+      averageLives,
     },
     flags: {
       current: flags,

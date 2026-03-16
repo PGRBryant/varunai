@@ -20,6 +20,7 @@ export interface PlayerSummary {
   floor: number;
   score: number;
   isAlive: boolean;
+  livesRemaining?: number;
 }
 
 export interface Standing {
@@ -42,6 +43,7 @@ export interface SessionState {
   averageScore: number;
   leaderboard: Standing[];
   startedAt: number;
+  cooperationRate?: number;
 }
 
 export function createV1SessionContext(session: SessionState): SessionContext {
